@@ -2,9 +2,9 @@ spring:
   application:
     name: Task-tracker-telegram-bot
   datasource:
-    url: ${POSTGRES_JDBC_URL:jdbc:postgresql://localhost:5432/postgres}
-    username: ${POSTGRES_USERNAME:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
+    url: ${POSTGRES_JDBC_URL:jdbc:postgresql://localhost:5432/telegram_bot}
+    username: ${POSTGRES_USERNAME:task_tracker_app}
+    password: ${POSTGRES_PASSWORD:abrakadabra}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

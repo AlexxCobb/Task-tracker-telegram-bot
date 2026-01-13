@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: task_tracker_user
+      POSTGRES_PASSWORD: abrakadabra
+      POSTGRES_DB: telegram_bot
+    volumes:
+      - ./db-volume:/var/lib/postgresql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
