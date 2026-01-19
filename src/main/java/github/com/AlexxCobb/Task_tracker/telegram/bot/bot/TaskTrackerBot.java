@@ -42,7 +42,12 @@ public class TaskTrackerBot implements SpringLongPollingBot, LongPollingSingleTh
 
     @Override
     public void consume(Update update) {
+        var message = dispatcher.dispatch(update);
+        if (message != null) {
+            sendMessage(message);
+        }
     }
+
 
     private void sendMessage(SendMessage sendMessage) {
         try {
