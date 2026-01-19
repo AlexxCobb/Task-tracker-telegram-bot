@@ -1,0 +1,70 @@
+package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.commandHandlers;
+
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.UpdateHandler;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.CallbackType;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+@Component
+public class StartCommandHandler implements UpdateHandler {
+
+    @Override
+    public Boolean canHandle(Update update) {
+        return update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().equals("/start");
+    }
+
+    @Override
+    public SendMessage handle(Update update) {
+        var chatId = update.getMessage().getChatId().toString();
+        return SendMessage.builder()
+                .chatId(chatId)
+                .text("""
+                              Привет! 👋
+                              Я помогу тебе:
+                              • создавать задачи
+                              • вести списки покупок
+                              • отмечать выполненное
+                              Выбери, что хочешь сделать:
+                              """)
+                .replyMarkup(getStartKeyboard()).build();
+    }
+
+    private InlineKeyboardMarkup getStartKeyboard() {
+        var createTaskBtn = InlineKeyboardButton.builder()
+                .text("➕ Создать задачу")
+                .callbackData(CallbackType.CREATE_TASK.name())
+                .build();
+
+        var createTaskWithSubtasksBtn = InlineKeyboardButton.builder()
+                .text("🧩 Создать задачу с подзадачами")
+                .callbackData(CallbackType.CREATE_TASK_WITH_SUBTASKS.name())
+                .build();
+
+        var createShoppingListBtn = InlineKeyboardButton.builder()
+                .text("\uD83D\uDED2 Создать список покупок")
+                .callbackData((CallbackType.CREATE_SHOPPING_LIST.name()))
+                .build();
+
+        var showTasksBtn = InlineKeyboardButton.builder()
+                .text("\uD83D\uDCCB Показать все задачи")
+                .callbackData((CallbackType.SHOW_TASKS.name()))
+                .build();
+
+        List<InlineKeyboardRow> keyboard = new ArrayList<>();
+
+        keyboard.add(new InlineKeyboardRow(List.of(createTaskBtn, createTaskWithSubtasksBtn)));
+        keyboard.add(new InlineKeyboardRow(List.of(createShoppingListBtn, showTasksBtn)));
+
+        return InlineKeyboardMarkup.builder()
+                .keyboard(keyboard)
+                .build();
+    }
+}
