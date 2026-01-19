@@ -1,6 +1,7 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.config.properties.BotProperties;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.UpdateDispatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -20,10 +21,12 @@ public class TaskTrackerBot implements SpringLongPollingBot, LongPollingSingleTh
 
     private final TelegramClient telegramClient;
     private final BotProperties botProperties;
+    private final UpdateDispatcher dispatcher;
 
 
-    public TaskTrackerBot(BotProperties botProperties) {
+    public TaskTrackerBot(BotProperties botProperties, UpdateDispatcher dispatcher) {
         this.botProperties = botProperties;
+        this.dispatcher = dispatcher;
         this.telegramClient = new OkHttpTelegramClient(getBotToken());
     }
 
