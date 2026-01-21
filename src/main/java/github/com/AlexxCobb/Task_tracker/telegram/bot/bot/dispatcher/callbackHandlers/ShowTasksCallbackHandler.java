@@ -1,9 +1,12 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers;
 
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.UpdateHandler;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+@Component
 public class ShowTasksCallbackHandler implements UpdateHandler {
 
     @Override

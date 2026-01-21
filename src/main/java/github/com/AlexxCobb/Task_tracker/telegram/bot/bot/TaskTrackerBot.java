@@ -1,7 +1,7 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.config.properties.BotProperties;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.UpdateDispatcher;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateDispatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;

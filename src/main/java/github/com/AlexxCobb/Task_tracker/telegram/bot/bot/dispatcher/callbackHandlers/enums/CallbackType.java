@@ -1,4 +1,4 @@
-package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers;
+package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums;
 
 public enum CallbackType {
     CREATE_TASK,
@@ -8,5 +8,6 @@ public enum CallbackType {
     TASK_EDIT,
     TASK_COMPLETE,
     TASK_DELETE,
-    SHOPPING_ITEM_TOGGLE
+    SHOPPING_ITEM_TOGGLE,
+    RETURN
 }
