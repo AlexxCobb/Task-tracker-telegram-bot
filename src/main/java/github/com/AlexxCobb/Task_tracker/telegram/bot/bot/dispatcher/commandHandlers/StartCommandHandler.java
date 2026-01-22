@@ -35,6 +35,4 @@ public class StartCommandHandler implements UpdateHandler {
                               """)
                 .replyMarkup(keyboardService.getStartKeyboard()).build();
     }
-
-
 }

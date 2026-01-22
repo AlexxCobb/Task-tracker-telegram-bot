@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 @RequiredArgsConstructor
-public class CreateTaskWithSubtasksCallbackHandler implements UpdateHandler {
+public class CreateSubtaskCallbackHandler implements UpdateHandler {
 
     private final DialogService dialogService;
 
@@ -19,18 +19,18 @@ public class CreateTaskWithSubtasksCallbackHandler implements UpdateHandler {
     public Boolean canHandle(Update update) {
         return update.hasCallbackQuery() && update.getCallbackQuery()
                 .getData()
-                .equals(CallbackType.CREATE_TASK_WITH_SUBTASKS.name());
+                .equals(CallbackType.CREATE_SUBTASK.name());
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getCallbackQuery().getMessage().getChatId();
 
-        dialogService.setState(chatId, DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE);
+        dialogService.setState(chatId, DialogState.AWAITING_SUBTASK);
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("✍️ Введите название основной задачи:")
+                .text("✍️ Введите название подзадачи:")
                 .build();
     }
 }
