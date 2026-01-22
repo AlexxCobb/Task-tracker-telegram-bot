@@ -13,7 +13,10 @@ public enum KeyboardButton {
     TASK_EDIT("✏️ Редактировать", CallbackType.TASK_EDIT),
     TASK_COMPLETE("✅ Завершить", CallbackType.TASK_COMPLETE),
     TASK_DELETE("🗑 Удалить", CallbackType.TASK_DELETE),
-    RETURN("◀️ Назад", CallbackType.RETURN);
+    RETURN("◀️ Назад", CallbackType.RETURN),
+
+    CREATE_SUBTASK("➕ Создать подзадачу", CallbackType.CREATE_SUBTASK),
+    LIST_DONE("Список составлен", CallbackType.LIST_DONE);
 
     private final String text;
     private final CallbackType callbackType;

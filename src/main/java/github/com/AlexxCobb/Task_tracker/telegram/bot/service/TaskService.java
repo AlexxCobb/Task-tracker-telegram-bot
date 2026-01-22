@@ -14,4 +14,8 @@ public class TaskService {
         tasks.put(chatId, title);
     }
 
+    public String getTasks(Long chatId) {
+        return tasks.get(chatId);
+    }
+
 }

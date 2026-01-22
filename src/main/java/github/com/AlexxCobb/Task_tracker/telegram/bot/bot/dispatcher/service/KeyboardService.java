@@ -21,6 +21,10 @@ public class KeyboardService {
                         row(KeyboardButton.TASK_DELETE, KeyboardButton.RETURN));
     }
 
+    public InlineKeyboardMarkup getSubtaskKeyboard(){
+        return keyboard(row(KeyboardButton.CREATE_SUBTASK, KeyboardButton.LIST_DONE));
+    }
+
     private InlineKeyboardRow row(KeyboardButton... buttons) {
         return new InlineKeyboardRow(Arrays.stream(buttons).map(KeyboardButton::toButton).toList());
     }
