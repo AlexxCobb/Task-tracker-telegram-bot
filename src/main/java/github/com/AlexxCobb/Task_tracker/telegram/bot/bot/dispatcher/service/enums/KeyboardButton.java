@@ -9,13 +9,13 @@ public enum KeyboardButton {
     CREATE_TASK_WITH_SUBTASKS("🧩 Создать задачу с подзадачами", CallbackType.CREATE_TASK_WITH_SUBTASKS),
     CREATE_SHOPPING_LIST("🛒 Создать список покупок", CallbackType.CREATE_SHOPPING_LIST),
     SHOW_TASKS("📋 Показать все задачи", CallbackType.SHOW_TASKS),
+    SHOW_SHOPPING_LIST("📋 Показать списки покупок", CallbackType.SHOW_SHOPPING_LIST),
 
     TASK_EDIT("✏️ Редактировать", CallbackType.TASK_EDIT),
     TASK_COMPLETE("✅ Завершить", CallbackType.TASK_COMPLETE),
     TASK_DELETE("🗑 Удалить", CallbackType.TASK_DELETE),
-    RETURN("◀️ Назад", CallbackType.RETURN),
+    MAIN_MENU("В главное меню", CallbackType.MAIN_MENU),
 
-    CREATE_SUBTASK("➕ Создать подзадачу", CallbackType.CREATE_SUBTASK),
     LIST_DONE("Список составлен", CallbackType.LIST_DONE);
 
     private final String text;
