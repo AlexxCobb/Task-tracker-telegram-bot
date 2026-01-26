@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: classpath:db/changelog/changeset/1769444395-add-user-table.yaml
+  - include:
+      file: classpath:db/changelog/changeset/1769444395-add-task-table.yaml

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1769444395-add-task-table
+      author: a.zinovev
+      changes:
+        - sqlFile:
+            path: classpath:db/changelog/sql/1769444395-add-task-table.sql
