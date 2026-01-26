@@ -13,16 +13,20 @@ public class KeyboardService {
 
     public InlineKeyboardMarkup getStartKeyboard() {
         return keyboard(row(KeyboardButton.CREATE_TASK, KeyboardButton.CREATE_TASK_WITH_SUBTASKS),
-                        row(KeyboardButton.CREATE_SHOPPING_LIST, KeyboardButton.SHOW_TASKS));
+                        row(KeyboardButton.CREATE_SHOPPING_LIST, KeyboardButton.SHOW_TASKS, KeyboardButton.SHOW_SHOPPING_LIST));
     }
 
     public InlineKeyboardMarkup getEditKeyboard() {
         return keyboard(row(KeyboardButton.TASK_EDIT, KeyboardButton.TASK_COMPLETE),
-                        row(KeyboardButton.TASK_DELETE, KeyboardButton.RETURN));
+                        row(KeyboardButton.TASK_DELETE, KeyboardButton.MAIN_MENU));
     }
 
     public InlineKeyboardMarkup getSubtaskKeyboard(){
-        return keyboard(row(KeyboardButton.CREATE_SUBTASK, KeyboardButton.LIST_DONE));
+        return keyboard(row(KeyboardButton.LIST_DONE));
+    }
+
+    public InlineKeyboardMarkup getShoppingListKeyboard(){
+        return keyboard(row(KeyboardButton.LIST_DONE));
     }
 
     private InlineKeyboardRow row(KeyboardButton... buttons) {

@@ -18,4 +18,8 @@ public class TaskService {
         return tasks.get(chatId);
     }
 
+    public void removeTask(Long chatId) {
+        tasks.remove(chatId);
+    }
+
 }

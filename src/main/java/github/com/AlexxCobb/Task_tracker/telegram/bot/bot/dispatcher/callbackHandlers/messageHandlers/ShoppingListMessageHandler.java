@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 @RequiredArgsConstructor
-public class SubtaskMessageHandler implements UpdateHandler {
+public class ShoppingListMessageHandler implements UpdateHandler {
 
     private final DialogService dialogService;
     private final TaskService taskService;
@@ -26,23 +26,22 @@ public class SubtaskMessageHandler implements UpdateHandler {
 
         var chatId = update.getMessage().getChatId();
         return update.hasMessage() && update.getMessage().hasText() && dialogService.getState(chatId).equals(
-                DialogState.AWAITING_SUBTASK);
+                DialogState.AWAITING_SHOPPING_ITEM);
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getMessage().getChatId();
         taskService.createTask(chatId, update.getMessage().getText());
-        dialogService.setState(chatId, DialogState.AWAITING_SUBTASK);
 
         return SendMessage.builder()
                 .chatId(chatId)
                 .text("""
-                              Название подзадачи сохранено!
+                              Название списка сохранено!
                               
-                              Напиши еще одну подзадачу или заверши составление списка.
+                              Напиши, что нужно купить (каждую позицию новым сообщением) или заверши составление списка:
                               """)
-                .replyMarkup(keyboardService.getSubtaskKeyboard())
+                .replyMarkup(keyboardService.getShoppingListKeyboard())
                 .build();
     }
 }

@@ -1,8 +1,8 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.DialogState;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,26 +11,30 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 @RequiredArgsConstructor
-public class CreateShoppingListCallbackHandler implements UpdateHandler {
+public class MainMenuCallbackHandler implements UpdateHandler {
 
     private final DialogService dialogService;
+    private final KeyboardService keyboardService;
 
     @Override
     public Boolean canHandle(Update update) {
         return update.hasCallbackQuery() && update.getCallbackQuery()
                 .getData()
-                .startsWith(CallbackType.CREATE_SHOPPING_LIST.name());
+                .equals(CallbackType.MAIN_MENU.name());
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getCallbackQuery().getMessage().getChatId();
 
-        dialogService.setState(chatId, DialogState.AWAITING_SHOPPING_ITEM);
+        dialogService.clearState(chatId);
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("✍️ Введи название списка:")
+                .text("""
+                              Выбери, что хочешь сделать:
+                              """)
+                .replyMarkup(keyboardService.getStartKeyboard())
                 .build();
     }
 }

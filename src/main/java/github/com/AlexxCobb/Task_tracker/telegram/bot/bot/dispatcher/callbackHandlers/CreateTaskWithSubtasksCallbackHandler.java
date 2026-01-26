@@ -30,7 +30,7 @@ public class CreateTaskWithSubtasksCallbackHandler implements UpdateHandler {
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("✍️ Введите название основной задачи:")
+                .text("✍️ Введи название основной задачи:")
                 .build();
     }
 }

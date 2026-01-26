@@ -1,6 +1,7 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class ShowTasksCallbackHandler implements UpdateHandler {
 
     private final TaskService taskService;
+    private final KeyboardService keyboardService;
 
     @Override
     public Boolean canHandle(Update update) {
@@ -29,8 +31,8 @@ public class ShowTasksCallbackHandler implements UpdateHandler {
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("Список ЗАДАЧ:")
-                .text(task)
+                .text(task == null ? "Еще нет задач" : task)
+                .replyMarkup(task == null ? keyboardService.getStartKeyboard() : keyboardService.getEditKeyboard())
                 .build();
     }
 }
