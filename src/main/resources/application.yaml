@@ -1,6 +1,9 @@
 spring:
   application:
     name: Task-tracker-telegram-bot
+  jpa:
+    hibernate:
+      ddl-auto: validate
   datasource:
     url: ${POSTGRES_JDBC_URL:jdbc:postgresql://localhost:5432/telegram_bot}
     username: ${POSTGRES_USERNAME:task_tracker_app}
@@ -9,7 +12,8 @@ spring:
     hikari:
       maximum-pool-size: 10
   liquibase:
-    enabled: false
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
 bot:
   name: toDo_taskTracker_bot
   token: 8562525731:AAETff0eFD46qa_qIN0PkqMAj3bJR2Kojbw
