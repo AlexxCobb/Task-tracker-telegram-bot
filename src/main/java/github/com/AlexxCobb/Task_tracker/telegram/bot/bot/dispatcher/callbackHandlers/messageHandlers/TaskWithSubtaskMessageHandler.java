@@ -1,6 +1,5 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.messageHandlers;
 
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.DialogState;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
@@ -16,7 +15,6 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
 
     private final DialogService dialogService;
     private final TaskService taskService;
-    private final KeyboardService keyboardService;
 
     @Override
     public Boolean canHandle(Update update) {
@@ -37,11 +35,7 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("""
-                              Название основной задачи сохранено!
-                              
-                              Напиши подзадачу:
-                              """)
+                .text("📝 Название основной задачи сохранено!\n\nНапиши подзадачу:")
                 .build();
     }
 }
