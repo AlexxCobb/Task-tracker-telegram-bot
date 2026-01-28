@@ -3,6 +3,7 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHa
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,27 +16,29 @@ public class TaskCompleteCallbackHandler implements UpdateHandler {
 
     private final TaskService taskService;
     private final KeyboardService keyboardService;
+    private final CallbackDataMapper dataMapper;
 
     @Override
     public Boolean canHandle(Update update) {
-        return update.hasCallbackQuery() && update.getCallbackQuery()
-                .getData()
-                .equals(CallbackType.TASK_COMPLETE.name());
+        if (update.hasCallbackQuery()) {
+            var data = update.getCallbackQuery().getData();
+            var dto = dataMapper.toDtoFromData(data);
+            return dto.getType().equals(CallbackType.TASK_COMPLETE);
+        }
+        return false;
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getCallbackQuery().getMessage().getChatId();
+        var data = update.getCallbackQuery().getData();
+        var dto = dataMapper.toDtoFromData(data);
 
-        taskService.removeTask(chatId); // сделать логику чтобы задача отмечалась галочкой, флаг у сущности
+        taskService.completeTask(chatId, dto.getEntityId());
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("""
-                              ✍️ Задача выполнена!
-                              
-                              Выбери, что хочешь сделать:
-                              """)
+                .text("✍️ Задача выполнена!\n\nВыбери, что хочешь сделать:")
                 .replyMarkup(keyboardService.getStartKeyboard())
                 .build();
     }

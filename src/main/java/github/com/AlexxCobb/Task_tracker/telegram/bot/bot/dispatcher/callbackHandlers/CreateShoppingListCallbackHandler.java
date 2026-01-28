@@ -2,6 +2,7 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHa
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.DialogState;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +15,16 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class CreateShoppingListCallbackHandler implements UpdateHandler {
 
     private final DialogService dialogService;
+    private final CallbackDataMapper dataMapper;
 
     @Override
     public Boolean canHandle(Update update) {
-        return update.hasCallbackQuery() && update.getCallbackQuery()
-                .getData()
-                .startsWith(CallbackType.CREATE_SHOPPING_LIST.name());
+        if (update.hasCallbackQuery()) {
+            var data = update.getCallbackQuery().getData();
+            var dto = dataMapper.toDtoFromData(data);
+            return dto.getType().equals(CallbackType.CREATE_SHOPPING_LIST);
+        }
+        return false;
     }
 
     @Override

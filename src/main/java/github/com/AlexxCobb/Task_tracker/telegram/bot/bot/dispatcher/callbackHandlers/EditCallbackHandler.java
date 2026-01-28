@@ -2,6 +2,7 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHa
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.DialogState;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
@@ -16,27 +17,30 @@ public class EditCallbackHandler implements UpdateHandler {
 
     private final DialogService dialogService;
     private final TaskService taskService;
+    private final CallbackDataMapper dataMapper;
 
     @Override
     public Boolean canHandle(Update update) {
-        return update.hasCallbackQuery() && update.getCallbackQuery()
-                .getData()
-                .equals(CallbackType.TASK_EDIT.name());
+        if (update.hasCallbackQuery()) {
+            var data = update.getCallbackQuery().getData();
+            var dto = dataMapper.toDtoFromData(data);
+            return dto.getType().equals(CallbackType.TASK_EDIT);
+        }
+        return false;
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getCallbackQuery().getMessage().getChatId();
+        var data = update.getCallbackQuery().getData();
+        var dto = dataMapper.toDtoFromData(data);
 
         dialogService.setState(chatId, DialogState.EDIT_TASK);
-        var task = taskService.getTasks(chatId);
+        var task = taskService.getTask(dto.getEntityId());
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("""
-                              ✍️ Напиши новое название:
-                              
-                              """)
+                .text("✍️ Напиши новое название:")
                 .build();
     }
 }

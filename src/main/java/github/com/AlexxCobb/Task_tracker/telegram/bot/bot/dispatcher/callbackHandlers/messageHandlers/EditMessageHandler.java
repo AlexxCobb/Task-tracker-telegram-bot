@@ -36,11 +36,7 @@ public class EditMessageHandler implements UpdateHandler {
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("""
-                              Название отредактировано!
-                              
-                              Выбери, что хочешь сделать:
-                              """)
+                .text("Название отредактировано!\n\nВыбери, что хочешь сделать:")
                 .replyMarkup(keyboardService.getStartKeyboard())
                 .build();
     }
