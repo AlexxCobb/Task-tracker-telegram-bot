@@ -3,6 +3,7 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHa
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,12 +16,16 @@ public class MainMenuCallbackHandler implements UpdateHandler {
 
     private final DialogService dialogService;
     private final KeyboardService keyboardService;
+    private final CallbackDataMapper dataMapper;
 
     @Override
     public Boolean canHandle(Update update) {
-        return update.hasCallbackQuery() && update.getCallbackQuery()
-                .getData()
-                .equals(CallbackType.MAIN_MENU.name());
+        if (update.hasCallbackQuery()) {
+            var data = update.getCallbackQuery().getData();
+            var dto = dataMapper.toDtoFromData(data);
+            return dto.getType().equals(CallbackType.MAIN_MENU);
+        }
+        return false;
     }
 
     @Override
@@ -31,9 +36,7 @@ public class MainMenuCallbackHandler implements UpdateHandler {
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("""
-                              Выбери, что хочешь сделать:
-                              """)
+                .text("\nВыбери, что хочешь сделать:")
                 .replyMarkup(keyboardService.getStartKeyboard())
                 .build();
     }
