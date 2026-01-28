@@ -1,6 +1,5 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.messageHandlers;
 
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.DialogState;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
@@ -16,7 +15,6 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
 
     private final DialogService dialogService;
     private final TaskService taskService;
-    private final KeyboardService keyboardService;
 
     @Override
     public Boolean canHandle(Update update) {
@@ -25,23 +23,30 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
         }
 
         var chatId = update.getMessage().getChatId();
-        return update.hasMessage() && update.getMessage().hasText() && dialogService.getState(chatId).equals(
-                DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE);
+        return update.hasMessage() && update.getMessage().hasText() && (dialogService.getState(chatId).equals(
+                DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE) || dialogService.getState(chatId).equals(
+                DialogState.AWAITING_SHOPPING_ITEM));
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getMessage().getChatId();
-        taskService.createTask(chatId, update.getMessage().getText());
-        dialogService.setState(chatId, DialogState.AWAITING_SUBTASK);
+        if (dialogService.getState(chatId).equals(DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE)) {
+            taskService.createEpicTask(chatId, update.getMessage().getText(), false);
+            dialogService.setState(chatId, DialogState.AWAITING_SUBTASK);
 
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text("""
-                              Название основной задачи сохранено!
-                              
-                              Напиши подзадачу:
-                              """)
-                .build();
+            return SendMessage.builder()
+                    .chatId(chatId)
+                    .text("📝 Название основной задачи сохранено!\n\nНапиши подзадачу:")
+                    .build();
+        } else {
+            taskService.createEpicTask(chatId, update.getMessage().getText(), true);
+            dialogService.setState(chatId, DialogState.AWAITING_SHOPPING_ITEM);
+
+            return SendMessage.builder()
+                    .chatId(chatId)
+                    .text("Название списка сохранено!\n\nНапиши, что нужно купить (каждую позицию новым сообщением):")
+                    .build();
+        }
     }
 }

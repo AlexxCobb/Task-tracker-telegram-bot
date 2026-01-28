@@ -37,11 +37,7 @@ public class TaskTitleMessageHandler implements UpdateHandler {
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("""
-                              Задача сохранена!
-                              
-                              Выбери, что хочешь сделать:
-                              """)
+                .text("✅ Задача сохранена!\n\nВыбери действие:")
                 .replyMarkup(keyboardService.getEditKeyboard())
                 .build();
     }

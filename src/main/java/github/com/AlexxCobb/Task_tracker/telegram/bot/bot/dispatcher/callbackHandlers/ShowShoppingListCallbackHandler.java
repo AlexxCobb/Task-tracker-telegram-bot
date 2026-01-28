@@ -3,6 +3,7 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHa
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,24 +16,28 @@ public class ShowShoppingListCallbackHandler implements UpdateHandler {
 
     private final TaskService taskService;
     private final KeyboardService keyboardService;
+    private final CallbackDataMapper dataMapper;
 
     @Override
     public Boolean canHandle(Update update) {
-        return update.hasCallbackQuery() && update.getCallbackQuery()
-                .getData()
-                .equals(CallbackType.SHOW_SHOPPING_LIST.name());
+        if (update.hasCallbackQuery()) {
+            var data = update.getCallbackQuery().getData();
+            var dto = dataMapper.toDtoFromData(data);
+            return dto.getType().equals(CallbackType.SHOW_SHOPPING_LIST);
+        }
+        return false;
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getCallbackQuery().getMessage().getChatId();
 
-        var task = taskService.getTasks(chatId);
+        var tasks = taskService.getTasks(chatId);
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text(task == null ? "Еще нет списка покупок" : task)
-                .replyMarkup(task == null ? keyboardService.getStartKeyboard() : keyboardService.getEditKeyboard())
+                .text(tasks == null ? "Еще нет списка покупок" : tasks)
+                .replyMarkup(tasks == null ? keyboardService.getStartKeyboard() : keyboardService.getEditKeyboard())
                 .build();
     }
 }
