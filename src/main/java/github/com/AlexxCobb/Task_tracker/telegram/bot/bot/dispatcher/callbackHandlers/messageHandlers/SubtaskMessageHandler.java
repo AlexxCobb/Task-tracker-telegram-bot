@@ -33,18 +33,19 @@ public class SubtaskMessageHandler implements UpdateHandler {
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getMessage().getChatId();
-        taskService.createTask(chatId, update.getMessage().getText());
-        
-        dialogService.setState(chatId, DialogState.AWAITING_SUBTASK);
+        taskService.createSubtaskWithEpic(chatId, update.getMessage().getText());
+
+        var currentState = dialogService.getState(chatId);
+        var isShoppingList = currentState.equals(DialogState.AWAITING_SHOPPING_ITEM);
+        var responseText = isShoppingList ?
+                "✅ Элемент списка добавлен!\n\nДобавь ещё или заверши:" :
+                "✅ Подзадача добавлена!\n\nДобавь ещё или заверши:";
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("""
-                              Название подзадачи сохранено!
-                              
-                              Напиши еще одну подзадачу или заверши составление списка.
-                              """)
-                .replyMarkup(keyboardService.getSubtaskKeyboard())
+                .text(responseText)
+                .replyMarkup(isShoppingList ? keyboardService.getShoppingListKeyboard()
+                                     : keyboardService.getSubtaskKeyboard())
                 .build();
     }
 }

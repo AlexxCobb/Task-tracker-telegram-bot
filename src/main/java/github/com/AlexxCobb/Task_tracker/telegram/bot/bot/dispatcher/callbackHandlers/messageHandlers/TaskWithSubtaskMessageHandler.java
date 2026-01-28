@@ -23,19 +23,30 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
         }
 
         var chatId = update.getMessage().getChatId();
-        return update.hasMessage() && update.getMessage().hasText() && dialogService.getState(chatId).equals(
-                DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE);
+        return update.hasMessage() && update.getMessage().hasText() && (dialogService.getState(chatId).equals(
+                DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE) || dialogService.getState(chatId).equals(
+                DialogState.AWAITING_SHOPPING_ITEM));
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getMessage().getChatId();
-        taskService.createTask(chatId, update.getMessage().getText());
-        dialogService.setState(chatId, DialogState.AWAITING_SUBTASK);
+        if (dialogService.getState(chatId).equals(DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE)) {
+            taskService.createEpicTask(chatId, update.getMessage().getText(), false);
+            dialogService.setState(chatId, DialogState.AWAITING_SUBTASK);
 
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text("📝 Название основной задачи сохранено!\n\nНапиши подзадачу:")
-                .build();
+            return SendMessage.builder()
+                    .chatId(chatId)
+                    .text("📝 Название основной задачи сохранено!\n\nНапиши подзадачу:")
+                    .build();
+        } else {
+            taskService.createEpicTask(chatId, update.getMessage().getText(), true);
+            dialogService.setState(chatId, DialogState.AWAITING_SHOPPING_ITEM);
+
+            return SendMessage.builder()
+                    .chatId(chatId)
+                    .text("Название списка сохранено!\n\nНапиши, что нужно купить (каждую позицию новым сообщением):")
+                    .build();
+        }
     }
 }
