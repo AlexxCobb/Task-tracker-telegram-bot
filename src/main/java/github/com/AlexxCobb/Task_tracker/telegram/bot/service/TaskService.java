@@ -46,7 +46,7 @@ public class TaskService {
     public void createEpicTask(Long chatId, String title, Boolean isShoppingList) {
         var user = userService.getUser(chatId);
         var taskId = currentEpicTaskMap.get(chatId);
-        var existedTask = getTask(taskId);
+        var existedTask = getTaskById(taskId);
         if (existedTask != null) {
             throw new TaskAlreadyExistException("Epic task already exist, finish it first");
         }
@@ -72,7 +72,7 @@ public class TaskService {
         }
 
         var subtask = Subtask.builder()
-                .task(getTask(taskId))
+                .task(getTaskById(taskId))
                 .title(title)
                 .status(Status.NEW)
                 .build();
@@ -82,19 +82,15 @@ public class TaskService {
 
     @Transactional
     public void editTask(Long chatId, Long taskId, String title) {
-        var user = userService.getUser(chatId);
-        var task = getTask(taskId);
-        if (!task.getUser().equals(user)) {
-            throw new ForbiddenException("User can only complete his own task");
-        }
-
+        checkUserOwnTask(chatId, taskId);
+        var task = getTaskById(taskId);
         task.setTitle(title);
     }
 
     @Transactional
     public void completeTask(Long chatId, Long taskId) {
-        userService.getUser(chatId);
-        var task = getTask(taskId);
+        checkUserOwnTask(chatId, taskId);
+        var task = getTaskById(taskId);
         if (task.getStatus().equals(Status.DONE)) {
             throw new AlreadyCompleteException("Task already complete");
         }
@@ -108,19 +104,27 @@ public class TaskService {
 
     @Transactional
     public void removeTask(Long chatId, Long taskId) {
-        var user = userService.getUser(chatId);
-        var task = getTask(taskId);
-        if (!task.getUser().equals(user)) {
-            throw new ForbiddenException("User can only remove his own task");
-        }
-        taskRepository.delete(task);
+        checkUserOwnTask(chatId, taskId);
+        taskRepository.deleteById(taskId);
     }
 
     public void finishingCreateEpicTask(Long chatId) {
         currentEpicTaskMap.remove(chatId);
     }
 
-    public Task getTask(Long taskId) {
+    public Task getTask(Long chatId, Long taskId) {
+        return taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task not found"));
+    }
+
+    private void checkUserOwnTask(Long chatId, Long taskId) {
+        var user = userService.getUser(chatId);
+        var task = getTaskById(taskId);
+        if (!task.getUser().equals(user)) {
+            throw new ForbiddenException("User can only remove his own task");
+        }
+    }
+
+    private Task getTaskById(Long taskId) {
         return taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task not found"));
     }
 }
