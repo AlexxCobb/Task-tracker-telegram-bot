@@ -32,7 +32,7 @@ public class EditMessageHandler implements UpdateHandler {
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getMessage().getChatId();
-        taskService.createTask(chatId, update.getMessage().getText());
+        taskService.editTask(chatId, ????, update.getMessage().getText());
 
         return SendMessage.builder()
                 .chatId(chatId)

@@ -36,7 +36,7 @@ public class EditCallbackHandler implements UpdateHandler {
         var dto = dataMapper.toDtoFromData(data);
 
         dialogService.setState(chatId, DialogState.EDIT_TASK);
-        var task = taskService.getTask(dto.getEntityId());
+        taskService.getTask(chatId, dto.getEntityId());
 
         return SendMessage.builder()
                 .chatId(chatId)
