@@ -16,13 +16,12 @@ public class MainMenuCallbackHandler implements UpdateHandler {
 
     private final DialogService dialogService;
     private final KeyboardService keyboardService;
-    private final CallbackDataMapper dataMapper;
 
     @Override
     public Boolean canHandle(Update update) {
         if (update.hasCallbackQuery()) {
             var data = update.getCallbackQuery().getData();
-            var dto = dataMapper.toDtoFromData(data);
+            var dto = CallbackDataMapper.toDtoFromData(data);
             return dto.getType().equals(CallbackType.MAIN_MENU);
         }
         return false;

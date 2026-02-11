@@ -8,15 +8,12 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.SubtaskRepo
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.TaskRepository;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.AlreadyCompleteException;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.ForbiddenException;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.TaskAlreadyExistException;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.TaskNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +23,9 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final SubtaskRepository subtaskRepository;
     private final UserService userService;
-    private final Map<Long, Long> currentEpicTaskMap = new ConcurrentHashMap<>();
 
     @Transactional
-    public void createTask(Long chatId, String title) {
+    public Long createTask(Long chatId, String title) {
         var user = userService.getUser(chatId);
 
         var task = Task.builder()
@@ -37,19 +33,16 @@ public class TaskService {
                 .title(title)
                 .type(TypeOfTask.TASK)
                 .status(Status.NEW)
+                .isShoppingList(false)
                 .build();
 
-        taskRepository.save(task);
+        var savedTask = taskRepository.save(task);
+        return savedTask.getId();
     }
 
     @Transactional
-    public void createEpicTask(Long chatId, String title, Boolean isShoppingList) {
+    public Long createEpicTask(Long chatId, String title, Boolean isShoppingList) {
         var user = userService.getUser(chatId);
-        var taskId = currentEpicTaskMap.get(chatId);
-        var existedTask = getTask(taskId);
-        if (existedTask != null) {
-            throw new TaskAlreadyExistException("Epic task already exist, finish it first");
-        }
 
         var task = Task.builder()
                 .user(user)
@@ -60,19 +53,18 @@ public class TaskService {
                 .build();
 
         var savedTask = taskRepository.save(task);
-        currentEpicTaskMap.put(chatId, savedTask.getId());
+        return savedTask.getId();
     }
 
     @Transactional
-    public void createSubtaskWithEpic(Long chatId, String title) {
-        userService.getUser(chatId);
-        var taskId = currentEpicTaskMap.get(chatId);
-        if (taskId == null) {
-            throw new TaskNotFoundException("No active epic task for chat: " + chatId);
-        }
+    public void createSubtaskWithEpic(Long taskId, String title) {
 
+        var existedTask = getTaskById(taskId);
+        if (!existedTask.getType().equals(TypeOfTask.EPIC_TASK)) {
+            throw new TaskNotFoundException();
+        }
         var subtask = Subtask.builder()
-                .task(getTask(taskId))
+                .task(getTaskById(taskId))
                 .title(title)
                 .status(Status.NEW)
                 .build();
@@ -82,45 +74,46 @@ public class TaskService {
 
     @Transactional
     public void editTask(Long chatId, Long taskId, String title) {
-        var user = userService.getUser(chatId);
-        var task = getTask(taskId);
-        if (!task.getUser().equals(user)) {
-            throw new ForbiddenException("User can only complete his own task");
+        var updated = taskRepository.updateTitle(taskId, chatId, title);
+        if (updated == 0) {
+            throw new ForbiddenException();
         }
-
-        task.setTitle(title);
     }
 
     @Transactional
     public void completeTask(Long chatId, Long taskId) {
-        userService.getUser(chatId);
-        var task = getTask(taskId);
+        var task = getTaskById(taskId);
         if (task.getStatus().equals(Status.DONE)) {
-            throw new AlreadyCompleteException("Task already complete");
+            throw new AlreadyCompleteException();
         }
-        task.complete();
+        var updated = taskRepository.updateStatus(taskId, chatId);
+        if (updated == 0) {
+            throw new ForbiddenException();
+        }
     }
 
     public List<Task> getTasks(Long chatId) {
-        userService.getUser(chatId);
-        return taskRepository.findByUserChatId(chatId);
+        return taskRepository.findByUserChatIdAndStatusAndIsShoppingList(chatId, false);
+    }
+
+    public List<Task> getShoppingList(Long chatId) {
+        return taskRepository.findByUserChatIdAndStatusAndIsShoppingList(chatId, true);
     }
 
     @Transactional
     public void removeTask(Long chatId, Long taskId) {
-        var user = userService.getUser(chatId);
-        var task = getTask(taskId);
-        if (!task.getUser().equals(user)) {
-            throw new ForbiddenException("User can only remove his own task");
+        checkUserOwnTask(chatId, taskId);
+        taskRepository.deleteById(taskId);
+    }
+
+    private void checkUserOwnTask(Long chatId, Long taskId) {
+        var task = getTaskById(taskId);
+        if (!task.getUser().getChatId().equals(chatId)) {
+            throw new ForbiddenException();
         }
-        taskRepository.delete(task);
     }
 
-    public void finishingCreateEpicTask(Long chatId) {
-        currentEpicTaskMap.remove(chatId);
-    }
-
-    public Task getTask(Long taskId) {
-        return taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task not found"));
+    private Task getTaskById(Long taskId) {
+        return taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
     }
 }

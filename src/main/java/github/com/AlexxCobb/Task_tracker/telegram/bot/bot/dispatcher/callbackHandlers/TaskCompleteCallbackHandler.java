@@ -16,13 +16,12 @@ public class TaskCompleteCallbackHandler implements UpdateHandler {
 
     private final TaskService taskService;
     private final KeyboardService keyboardService;
-    private final CallbackDataMapper dataMapper;
 
     @Override
     public Boolean canHandle(Update update) {
         if (update.hasCallbackQuery()) {
             var data = update.getCallbackQuery().getData();
-            var dto = dataMapper.toDtoFromData(data);
+            var dto = CallbackDataMapper.toDtoFromData(data);
             return dto.getType().equals(CallbackType.TASK_COMPLETE);
         }
         return false;
@@ -32,7 +31,7 @@ public class TaskCompleteCallbackHandler implements UpdateHandler {
     public SendMessage handle(Update update) {
         var chatId = update.getCallbackQuery().getMessage().getChatId();
         var data = update.getCallbackQuery().getData();
-        var dto = dataMapper.toDtoFromData(data);
+        var dto = CallbackDataMapper.toDtoFromData(data);
 
         taskService.completeTask(chatId, dto.getEntityId());
 

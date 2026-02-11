@@ -1,6 +1,8 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.enums;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 public enum KeyboardButton {
@@ -21,15 +23,24 @@ public enum KeyboardButton {
     private final String text;
     private final CallbackType callbackType;
 
-    KeyboardButton(String text, CallbackType callbackType1) {
+    KeyboardButton(String text, CallbackType callbackType) {
         this.text = text;
-        this.callbackType = callbackType1;
+        this.callbackType = callbackType;
     }
 
     public InlineKeyboardButton toButton() {
+        return toButton(null);
+    }
+
+    public InlineKeyboardButton toButton(Long entityId) {
+        var callbackData = CallbackDto.builder()
+                .type(callbackType)
+                .entityId(entityId)
+                .build();
+
         return InlineKeyboardButton.builder()
                 .text(text)
-                .callbackData(callbackType.name())
+                .callbackData(CallbackDataMapper.toDataFromDto(callbackData))
                 .build();
     }
 }
