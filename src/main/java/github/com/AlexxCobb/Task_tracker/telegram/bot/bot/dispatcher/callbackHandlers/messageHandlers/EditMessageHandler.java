@@ -25,14 +25,16 @@ public class EditMessageHandler implements UpdateHandler {
         }
 
         var chatId = update.getMessage().getChatId();
-        return update.hasMessage() && update.getMessage().hasText() && dialogService.getState(chatId).equals(
-                DialogState.EDIT_TASK);
+        return dialogService.getStateOrDefault(chatId).equals(DialogState.EDIT_TASK);
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getMessage().getChatId();
-        taskService.editTask(chatId, ????, update.getMessage().getText());
+        var taskId = dialogService.getTaskId(chatId);
+
+        taskService.editTask(chatId, taskId, update.getMessage().getText());
+        dialogService.clearState(chatId);
 
         return SendMessage.builder()
                 .chatId(chatId)

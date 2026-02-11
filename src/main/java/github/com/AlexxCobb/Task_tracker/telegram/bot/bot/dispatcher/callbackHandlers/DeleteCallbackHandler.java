@@ -18,13 +18,12 @@ public class DeleteCallbackHandler implements UpdateHandler {
     private final DialogService dialogService;
     private final TaskService taskService;
     private final KeyboardService keyboardService;
-    private final CallbackDataMapper dataMapper;
 
     @Override
     public Boolean canHandle(Update update) {
         if (update.hasCallbackQuery()) {
             var data = update.getCallbackQuery().getData();
-            var dto = dataMapper.toDtoFromData(data);
+            var dto = CallbackDataMapper.toDtoFromData(data);
             return dto.getType().equals(CallbackType.TASK_DELETE);
         }
         return false;
@@ -34,7 +33,7 @@ public class DeleteCallbackHandler implements UpdateHandler {
     public SendMessage handle(Update update) {
         var chatId = update.getCallbackQuery().getMessage().getChatId();
         var data = update.getCallbackQuery().getData();
-        var dto = dataMapper.toDtoFromData(data);
+        var dto = CallbackDataMapper.toDtoFromData(data);
 
         dialogService.clearState(chatId);
         taskService.removeTask(chatId, dto.getEntityId());

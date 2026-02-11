@@ -2,6 +2,7 @@ spring:
   application:
     name: Task-tracker-telegram-bot
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: validate
   datasource:

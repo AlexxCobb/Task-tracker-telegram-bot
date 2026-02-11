@@ -15,13 +15,12 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class CreateTaskWithSubtasksCallbackHandler implements UpdateHandler {
 
     private final DialogService dialogService;
-    private final CallbackDataMapper dataMapper;
 
     @Override
     public Boolean canHandle(Update update) {
         if (update.hasCallbackQuery()) {
             var data = update.getCallbackQuery().getData();
-            var dto = dataMapper.toDtoFromData(data);
+            var dto = CallbackDataMapper.toDtoFromData(data);
             return dto.getType().equals(CallbackType.CREATE_TASK_WITH_SUBTASKS);
         }
         return false;
@@ -31,7 +30,7 @@ public class CreateTaskWithSubtasksCallbackHandler implements UpdateHandler {
     public SendMessage handle(Update update) {
         var chatId = update.getCallbackQuery().getMessage().getChatId();
 
-        dialogService.setState(chatId, DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE);
+        dialogService.setDialogState(chatId, DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE, null);
 
         return SendMessage.builder()
                 .chatId(chatId)

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "telegram_user")
 public class User {
@@ -20,5 +20,10 @@ public class User {
     @Id
     @Column(name = "chat_id")
     private Long chatId;
+
     private String name;
+
+    public void updateName(String newName){
+        this.name = newName;
+    }
 }
