@@ -17,7 +17,7 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @Table(name = "dialog_context")
 @NoArgsConstructor
 @AllArgsConstructor

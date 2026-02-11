@@ -5,9 +5,12 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHan
 import org.springframework.stereotype.Component;
 
 @Component
-public class CallbackDataMapper {
+public final class CallbackDataMapper {
 
-    public String toDataFromDto(CallbackDto dto) {
+    private CallbackDataMapper() {
+    }
+
+    public static String toDataFromDto(CallbackDto dto) {
         var sb = new StringBuilder();
         sb.append(dto.getType()).append(":");
         if (dto.getEntityId() != null) {
@@ -16,7 +19,7 @@ public class CallbackDataMapper {
         return sb.toString();
     }
 
-    public CallbackDto toDtoFromData(String data) {
+    public static CallbackDto toDtoFromData(String data) {
         var strArray = data.split(":");
         var type = CallbackType.valueOf(strArray[0]);
         var entityId = strArray.length == 2 ? Long.valueOf(strArray[1]) : null;

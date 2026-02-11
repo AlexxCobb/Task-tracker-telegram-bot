@@ -25,17 +25,19 @@ public class SubtaskMessageHandler implements UpdateHandler {
         }
 
         var chatId = update.getMessage().getChatId();
-        return update.hasMessage() && update.getMessage().hasText() && (dialogService.getState(chatId).equals(
-                DialogState.AWAITING_SUBTASK) || dialogService.getState(chatId).equals(
-                DialogState.AWAITING_SHOPPING_ITEM));
+        return dialogService.getStateOrDefault(chatId).equals(
+                DialogState.AWAITING_SUBTASK) || dialogService.getStateOrDefault(chatId)
+                .equals(DialogState.AWAITING_SHOPPING_ITEM);
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getMessage().getChatId();
-        taskService.createSubtaskWithEpic(chatId, update.getMessage().getText());
+        var taskId = dialogService.getTaskId(chatId);
 
-        var currentState = dialogService.getState(chatId);
+        taskService.createSubtaskWithEpic(taskId, update.getMessage().getText());
+
+        var currentState = dialogService.getStateOrDefault(chatId);
         var isShoppingList = currentState.equals(DialogState.AWAITING_SHOPPING_ITEM);
         var responseText = isShoppingList ?
                 "✅ Элемент списка добавлен!\n\nДобавь ещё или заверши:" :
@@ -44,8 +46,7 @@ public class SubtaskMessageHandler implements UpdateHandler {
         return SendMessage.builder()
                 .chatId(chatId)
                 .text(responseText)
-                .replyMarkup(isShoppingList ? keyboardService.getShoppingListKeyboard()
-                                     : keyboardService.getSubtaskKeyboard())
+                .replyMarkup(keyboardService.getListDoneKeyboard())
                 .build();
     }
 }
