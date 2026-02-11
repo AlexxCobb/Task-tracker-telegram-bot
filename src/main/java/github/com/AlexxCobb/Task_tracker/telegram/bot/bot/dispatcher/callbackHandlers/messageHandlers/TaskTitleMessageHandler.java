@@ -25,20 +25,19 @@ public class TaskTitleMessageHandler implements UpdateHandler {
         }
 
         var chatId = update.getMessage().getChatId();
-        return update.hasMessage() && update.getMessage().hasText() && dialogService.getState(chatId).equals(
-                DialogState.AWAITING_TASK_TITLE);
+        return dialogService.getStateOrDefault(chatId).equals(DialogState.AWAITING_TASK_TITLE);
     }
 
     @Override
     public SendMessage handle(Update update) {
         var chatId = update.getMessage().getChatId();
-        taskService.createTask(chatId, update.getMessage().getText());
+        var taskId = taskService.createTask(chatId, update.getMessage().getText());
         dialogService.clearState(chatId);
 
         return SendMessage.builder()
                 .chatId(chatId)
                 .text("✅ Задача сохранена!\n\nВыбери действие:")
-                .replyMarkup(keyboardService.getEditKeyboard())
+                .replyMarkup(keyboardService.getEditKeyboard(taskId))
                 .build();
     }
 }
