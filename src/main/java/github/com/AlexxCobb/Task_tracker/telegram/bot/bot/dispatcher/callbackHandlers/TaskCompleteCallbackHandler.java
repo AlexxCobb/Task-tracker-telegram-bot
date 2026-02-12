@@ -7,7 +7,10 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.Upd
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -18,19 +21,26 @@ public class TaskCompleteCallbackHandler implements UpdateHandler {
 
     @Override
     public Boolean canHandle(UpdateContext context) {
-        return context.isCallback() && context.dto().getType().equals(CallbackType.TASK_COMPLETE);
+        return context.isCallback() && (
+                context.dto().getType().equals(CallbackType.TASK_COMPLETE) ||
+                        context.dto().getType().equals(CallbackType.SUBTASK_COMPLETE));
     }
 
     @Override
-    public SendMessage handle(UpdateContext context) {
+    public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
+        var isTask = context.dto().getType() == CallbackType.TASK_COMPLETE;
 
-        taskService.completeTask(chatId, context.dto().getEntityId());
+        if (isTask) {
+            taskService.completeTask(chatId, context.dto().getEntityId());
+        } else {
+            taskService.completeSubtask(context.dto().getEntityId());
+        }
 
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text("✍️ Задача выполнена!\n\nВыбери, что хочешь сделать:")
-                .replyMarkup(keyboardService.getStartKeyboard())
-                .build();
+        return List.of(SendMessage.builder()
+                               .chatId(chatId)
+                               .text("✅ Задача выполнена!\n\nВыбери, что хочешь сделать:")
+                               .replyMarkup(keyboardService.getStartKeyboard())
+                               .build());
     }
 }

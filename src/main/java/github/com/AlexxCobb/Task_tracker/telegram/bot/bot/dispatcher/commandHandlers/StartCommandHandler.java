@@ -5,7 +5,10 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.Key
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
+import java.util.List;
 
 
 @Component
@@ -20,19 +23,19 @@ public class StartCommandHandler implements UpdateHandler {
     }
 
     @Override
-    public SendMessage handle(UpdateContext context) {
+    public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text("""
-                              Привет! 👋
-                              Я помогу тебе:
-                              • создавать задачи
-                              • вести списки покупок
-                              • отмечать выполненное
-                              
-                              Выбери, что хочешь сделать:
-                              """)
-                .replyMarkup(keyboardService.getStartKeyboard()).build();
+        return List.of(SendMessage.builder()
+                               .chatId(chatId)
+                               .text("""
+                                             Привет! 👋
+                                             Я помогу тебе:
+                                             • создавать задачи
+                                             • вести списки покупок
+                                             • отмечать выполненное
+                                             
+                                             Выбери, что хочешь сделать:
+                                             """)
+                               .replyMarkup(keyboardService.getStartKeyboard()).build());
     }
 }
