@@ -64,7 +64,7 @@ public class TaskService {
             throw new TaskNotFoundException();
         }
         var subtask = Subtask.builder()
-                .task(getTaskById(taskId))
+                .task(existedTask)
                 .title(title)
                 .status(Status.NEW)
                 .build();
@@ -92,6 +92,18 @@ public class TaskService {
         }
     }
 
+    @Transactional
+    public void completeSubtask(Long taskId) {
+        var task = subtaskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        if (task.getStatus().equals(Status.DONE)) {
+            throw new AlreadyCompleteException();
+        }
+        var updated = subtaskRepository.updateStatus(taskId);
+        if (updated == 0) {
+            throw new ForbiddenException();
+        }
+    }
+
     public List<Task> getTasks(Long chatId) {
         return taskRepository.findByUserChatIdAndStatusAndIsShoppingList(chatId, false);
     }
@@ -102,13 +114,16 @@ public class TaskService {
 
     @Transactional
     public void removeTask(Long chatId, Long taskId) {
-        checkUserOwnTask(chatId, taskId);
-        taskRepository.deleteById(taskId);
+        int deleted = taskRepository.deleteByIdAndUserChatId(taskId, chatId);
+        if (deleted == 0) {
+            throw new ForbiddenException();
+        }
     }
 
-    private void checkUserOwnTask(Long chatId, Long taskId) {
-        var task = getTaskById(taskId);
-        if (!task.getUser().getChatId().equals(chatId)) {
+    @Transactional
+    public void removeSubtask(Long taskId) {
+        int deleted = subtaskRepository.deleteByIdAndUserChatId(taskId);
+        if (deleted == 0) {
             throw new ForbiddenException();
         }
     }

@@ -7,30 +7,38 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.Upd
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class MainMenuCallbackHandler implements UpdateHandler {
+public class ReturnToMenuCallbackHandler implements UpdateHandler {
 
     private final DialogService dialogService;
     private final KeyboardService keyboardService;
 
     @Override
     public Boolean canHandle(UpdateContext context) {
-        return context.isCallback() && context.dto().getType().equals(CallbackType.MAIN_MENU);
+        return context.isCallback() && (context.dto().getType().equals(CallbackType.LIST_DONE)
+                || context.dto().getType().equals(CallbackType.MAIN_MENU));
     }
 
     @Override
-    public SendMessage handle(UpdateContext context) {
+    public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
 
         dialogService.clearState(chatId);
 
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text("\nВыбери, что хочешь сделать:")
-                .replyMarkup(keyboardService.getStartKeyboard())
-                .build();
+        var text =
+                context.dto().getType() == CallbackType.LIST_DONE ? "✅ Список сохранен!\n\nВыбери, что хочешь сделать:"
+                        : "\nВыбери, что хочешь сделать:";
+
+        return List.of(SendMessage.builder()
+                               .chatId(chatId)
+                               .text(text)
+                               .replyMarkup(keyboardService.getStartKeyboard())
+                               .build());
     }
 }

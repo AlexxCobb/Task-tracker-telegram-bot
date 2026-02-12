@@ -8,7 +8,10 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -24,17 +27,17 @@ public class EditMessageHandler implements UpdateHandler {
     }
 
     @Override
-    public SendMessage handle(UpdateContext context) {
+    public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
         var taskId = dialogService.getTaskId(chatId);
 
         taskService.editTask(chatId, taskId, context.getText());
         dialogService.clearState(chatId);
 
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text("Название отредактировано!\n\nВыбери, что хочешь сделать:")
-                .replyMarkup(keyboardService.getStartKeyboard())
-                .build();
+        return List.of(SendMessage.builder()
+                               .chatId(chatId)
+                               .text("Название отредактировано!\n\nВыбери, что хочешь сделать:")
+                               .replyMarkup(keyboardService.getStartKeyboard())
+                               .build());
     }
 }

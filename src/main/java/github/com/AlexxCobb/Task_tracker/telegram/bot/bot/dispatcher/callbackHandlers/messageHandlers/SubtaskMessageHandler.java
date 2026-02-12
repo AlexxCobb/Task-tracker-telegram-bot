@@ -8,7 +8,10 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -20,13 +23,14 @@ public class SubtaskMessageHandler implements UpdateHandler {
 
     @Override
     public Boolean canHandle(UpdateContext context) {
-        return context.isTextMessage() && context.dialogState().equals(
-                DialogState.AWAITING_SUBTASK) || context.dialogState()
-                .equals(DialogState.AWAITING_SHOPPING_ITEM);
+        return context.isTextMessage() && (
+                context.dialogState() == DialogState.AWAITING_SUBTASK
+                        || context.dialogState() == DialogState.AWAITING_SHOPPING_ITEM
+        );
     }
 
     @Override
-    public SendMessage handle(UpdateContext context) {
+    public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
 
         var chatId = context.chatId();
         var taskId = dialogService.getTaskId(chatId);
@@ -39,10 +43,10 @@ public class SubtaskMessageHandler implements UpdateHandler {
                 "✅ Элемент списка добавлен!\n\nДобавь ещё или заверши:" :
                 "✅ Подзадача добавлена!\n\nДобавь ещё или заверши:";
 
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text(responseText)
-                .replyMarkup(keyboardService.getListDoneKeyboard())
-                .build();
+        return List.of(SendMessage.builder()
+                               .chatId(chatId)
+                               .text(responseText)
+                               .replyMarkup(keyboardService.getListDoneKeyboard())
+                               .build());
     }
 }

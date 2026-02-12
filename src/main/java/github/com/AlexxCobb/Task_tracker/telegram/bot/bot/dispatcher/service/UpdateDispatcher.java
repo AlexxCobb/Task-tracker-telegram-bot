@@ -8,9 +8,10 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -22,7 +23,7 @@ public class UpdateDispatcher {
     private final ExceptionHandler exceptionHandler;
     private final DialogService dialogService;
 
-    public SendMessage dispatch(Update update) {
+    public List<PartialBotApiMethod<?>> dispatch(Update update) {
         try {
             var chatId = extractChatId(update);
             userService.ensureUser(update);
@@ -35,10 +36,10 @@ public class UpdateDispatcher {
                     .filter(h -> h.canHandle(context))
                     .findFirst()
                     .map(h -> h.handle(context))
-                    .orElse(null);
+                    .orElse(Collections.emptyList());
 
         } catch (Exception e) {
-            return exceptionHandler.handleException(update, e);
+            return Collections.singletonList(exceptionHandler.handleException(update, e));
         }
     }
 
