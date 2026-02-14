@@ -3,6 +3,8 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.service;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TaskStatusFilter;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TaskViewType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TypeOfTask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.SubtaskRepository;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.TaskRepository;
@@ -64,7 +66,7 @@ public class TaskService {
             throw new TaskNotFoundException();
         }
         var subtask = Subtask.builder()
-                .task(getTaskById(taskId))
+                .task(existedTask)
                 .title(title)
                 .status(Status.NEW)
                 .build();
@@ -92,23 +94,49 @@ public class TaskService {
         }
     }
 
-    public List<Task> getTasks(Long chatId) {
-        return taskRepository.findByUserChatIdAndStatusAndIsShoppingList(chatId, false);
+    @Transactional
+    public void completeSubtask(Long taskId) {
+        var task = subtaskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        if (task.getStatus().equals(Status.DONE)) {
+            throw new AlreadyCompleteException();
+        }
+        var updated = subtaskRepository.updateStatus(taskId);
+        if (updated == 0) {
+            throw new ForbiddenException();
+        }
     }
 
-    public List<Task> getShoppingList(Long chatId) {
-        return taskRepository.findByUserChatIdAndStatusAndIsShoppingList(chatId, true);
+    public Task getTaskForUser(Long chatId, Long taskId) {
+        return taskRepository.findUserChatIdAndById(chatId, taskId).orElseThrow(TaskNotFoundException::new);
+    }
+
+    public Subtask getSubtaskForUser(Long taskId) {
+        return subtaskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+    }
+
+    public List<Task> getTasks(Long chatId, TaskStatusFilter filter, TaskViewType type) {
+        //маппинг фильтра и типа
+        var isShoppingList = type == TaskViewType.SHOPPING_LIST;
+        return switch (filter) {
+            case ALL -> isShoppingList ? taskRepository.findUserShoppingList(chatId)
+                    : taskRepository.findAllUserTasks(chatId);
+            case ACTIVE -> taskRepository.findUserTasksWithStatus(chatId, Status.NEW);
+            case COMPLETED -> taskRepository.findUserTasksWithStatus(chatId, Status.DONE);
+        };
     }
 
     @Transactional
     public void removeTask(Long chatId, Long taskId) {
-        checkUserOwnTask(chatId, taskId);
-        taskRepository.deleteById(taskId);
+        int deleted = taskRepository.deleteByIdAndUserChatId(taskId, chatId);
+        if (deleted == 0) {
+            throw new ForbiddenException();
+        }
     }
 
-    private void checkUserOwnTask(Long chatId, Long taskId) {
-        var task = getTaskById(taskId);
-        if (!task.getUser().getChatId().equals(chatId)) {
+    @Transactional
+    public void removeSubtask(Long taskId) {
+        int deleted = subtaskRepository.deleteByIdAndUserChatId(taskId);
+        if (deleted == 0) {
             throw new ForbiddenException();
         }
     }
