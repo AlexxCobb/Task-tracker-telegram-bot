@@ -4,6 +4,8 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHan
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.formatter.TaskListMessageBuilder;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.UpdateContext;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TaskStatusFilter;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TaskViewType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,8 +33,15 @@ public class ShowTasksAndListCallbackHandler implements UpdateHandler {
     public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
 
+        var tasks = switch (context.dto().getType()) {
+            case SHOW_ALL_TASKS -> taskService.getTasks(chatId, TaskStatusFilter.ALL, TaskViewType.TASKS);
+            case SHOW_ACTIVE_TASKS -> taskService.getTasks(chatId, TaskStatusFilter.ACTIVE, TaskViewType.TASKS);
+            case SHOW_COMPLETED_TASKS -> taskService.getTasks(chatId, TaskStatusFilter.COMPLETED, TaskViewType.TASKS);
+            case SHOW_SHOPPING_LIST -> taskService.getTasks(chatId, TaskStatusFilter.ALL, TaskViewType.SHOPPING_LIST);
+            default -> throw new IllegalStateException("Unexpected value: " + context.dto().getType());
+        };
+
         var isShoppingList = context.dto().getType() == CallbackType.SHOW_SHOPPING_LIST;
-        var tasks = isShoppingList ? taskService.getShoppingList(chatId) : taskService.getTasks(chatId);
 
         return messageBuilder.buildTaskList(chatId, tasks, isShoppingList);
     }

@@ -1,31 +1,89 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.formatter;
 
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class TaskMessageFormatter {
 
-    public String formatTask(Task task) {
+    public String formatTask(List<Task> tasks) {
 
-        var sb = new StringBuilder();
-        sb.append("**  ").append(task.getTitle()).append("  **\n");
-
-        if (task.getSubtasks() != null && !task.getSubtasks().isEmpty()) {
-            sb.append("\n");
-            for (var subtask : task.getSubtasks()) {
-                var statusEmoji = subtask.getStatus() == Status.DONE ? "✅" : "⏳";
-                sb.append(statusEmoji).append(" ").append(subtask.getTitle()).append("\n");
-            }
+        if (tasks.isEmpty()) {
+            return "📭 У вас пока нет задач";
         }
+
+        var sb = new StringBuilder("📋 Ваши задачи:\n\n");
+
+        for (int i = 0; i < tasks.size(); i++) {
+            var task = tasks.get(i);
+            var status = task.getStatus() == Status.DONE ? "✅" : "⏳";
+
+            sb.append(i + 1)
+                    .append(". ")
+                    .append(task.getTitle())
+                    .append(" ")
+                    .append(status)
+                    .append("\n");
+            if (task.getSubtasks() != null && !task.getSubtasks().isEmpty()) {
+                for (var sub : task.getSubtasks()) {
+                    var subStatus = sub.getStatus() == Status.DONE ? "   └ ✅ " : "   └ ⏳ ";
+                    sb.append(subStatus)
+                            .append(sub.getTitle())
+                            .append("\n");
+                }
+            }
+            sb.append("\n");
+        }
+
         return sb.toString();
     }
 
-    public String formatHeader(boolean isShoppingList, boolean isEmpty) {
-        if (isEmpty) {
-            return isShoppingList ? "\uD83D\uDED2 Списков покупок пока нет" : "📭 У вас пока нет задач";
+    public String formatTaskDetails(Task task) {
+
+        var sb = new StringBuilder();
+        var status = task.getStatus() == Status.DONE ? "✅" : "⏳";
+
+        sb.append("📌 ")
+                .append(task.getTitle())
+                .append(" ")
+                .append(status)
+                .append("\n\n");
+
+        if (task.getSubtasks() != null && !task.getSubtasks().isEmpty()) {
+
+            sb.append("Подзадачи:\n\n");
+
+            for (int i = 0; i < task.getSubtasks().size(); i++) {
+                var sub = task.getSubtasks().get(i);
+                var subStatus = sub.getStatus() == Status.DONE ? "✅" : "⏳";
+
+                sb.append(i + 1)
+                        .append(". ")
+                        .append(sub.getTitle())
+                        .append(" ")
+                        .append(subStatus)
+                        .append("\n");
+            }
         }
-        return isShoppingList ? "\uD83D\uDED2 ** Ваш список покупок: **\n\n" : "📋 ** Ваши задачи: **\n\n";
+
+        return sb.toString();
+    }
+
+    public String formatSubtaskDetails(Subtask subtask) {
+
+        var sb = new StringBuilder();
+        var status = subtask.getStatus() == Status.DONE ? "✅" : "⏳";
+
+        sb.append("📌 ")
+                .append(subtask.getTitle())
+                .append(" ")
+                .append(status)
+                .append("\n\n");
+
+        return sb.toString();
     }
 }

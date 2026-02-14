@@ -3,6 +3,8 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.service;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TaskStatusFilter;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TaskViewType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TypeOfTask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.SubtaskRepository;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.TaskRepository;
@@ -104,12 +106,23 @@ public class TaskService {
         }
     }
 
-    public List<Task> getTasks(Long chatId) {
-        return taskRepository.findByUserChatIdAndStatusAndIsShoppingList(chatId, false);
+    public Task getTaskForUser(Long chatId, Long taskId) {
+        return taskRepository.findUserChatIdAndById(chatId, taskId).orElseThrow(TaskNotFoundException::new);
     }
 
-    public List<Task> getShoppingList(Long chatId) {
-        return taskRepository.findByUserChatIdAndStatusAndIsShoppingList(chatId, true);
+    public Subtask getSubtaskForUser(Long taskId) {
+        return subtaskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+    }
+
+    public List<Task> getTasks(Long chatId, TaskStatusFilter filter, TaskViewType type) {
+        //маппинг фильтра и типа
+        var isShoppingList = type == TaskViewType.SHOPPING_LIST;
+        return switch (filter) {
+            case ALL -> isShoppingList ? taskRepository.findUserShoppingList(chatId)
+                    : taskRepository.findAllUserTasks(chatId);
+            case ACTIVE -> taskRepository.findUserTasksWithStatus(chatId, Status.NEW);
+            case COMPLETED -> taskRepository.findUserTasksWithStatus(chatId, Status.DONE);
+        };
     }
 
     @Transactional
