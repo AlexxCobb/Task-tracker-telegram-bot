@@ -1,6 +1,7 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.formatter.TaskMessageFormatter;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.UpdateContext;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
@@ -14,33 +15,31 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class TaskCompleteCallbackHandler implements UpdateHandler {
+public class SelectSubtaskCallbackHandler implements UpdateHandler {
 
     private final TaskService taskService;
     private final KeyboardService keyboardService;
+    private final TaskMessageFormatter formatter;
 
     @Override
     public Boolean canHandle(UpdateContext context) {
-        return context.isCallback() && (
-                context.dto().getType().equals(CallbackType.TASK_COMPLETE) ||
-                        context.dto().getType().equals(CallbackType.SUBTASK_COMPLETE));
+        return context.isCallback() && context.dto().getType() == CallbackType.SELECT_SUBTASK;
     }
 
     @Override
     public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
+
         var chatId = context.chatId();
-        var isTask = context.dto().getType() == CallbackType.TASK_COMPLETE;
+        var subtaskId = context.dto().getEntityId();
 
-        if (isTask) {
-            taskService.completeTask(chatId, context.dto().getEntityId());
-        } else {
-            taskService.completeSubtask(context.dto().getEntityId());
-        }
+        var subtask = taskService.getSubtaskForUser(subtaskId);
 
-        return List.of(SendMessage.builder()
-                               .chatId(chatId)
-                               .text("✅ Задача выполнена!\n\nВыбери, что хочешь сделать:")
-                               .replyMarkup(keyboardService.getStartKeyboard())
-                               .build());
+        return List.of(
+                SendMessage.builder()
+                        .chatId(chatId)
+                        .text(formatter.formatSubtaskDetails(subtask))
+                        .replyMarkup(keyboardService.getSubtaskActionsKeyboard(subtaskId))
+                        .build()
+        );
     }
 }
