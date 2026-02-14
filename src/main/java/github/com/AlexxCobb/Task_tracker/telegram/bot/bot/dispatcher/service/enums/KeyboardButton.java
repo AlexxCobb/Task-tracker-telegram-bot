@@ -20,6 +20,10 @@ public enum KeyboardButton {
     TASK_COMPLETE("✅ Завершить", CallbackType.TASK_COMPLETE),
     TASK_DELETE("🗑️ Удалить", CallbackType.TASK_DELETE),
 
+    SELECT_TASK("Выбери задачу",CallbackType.SELECT_TASK),
+    SELECT_SUBTASK("Выбери подзадачу",CallbackType.SELECT_SUBTASK),
+    OPEN_SUBTASKS("📂 Открыть подзадачи", CallbackType.OPEN_SUBTASKS),
+
     SUBTASK_COMPLETE("✅ Выполнено", CallbackType.SUBTASK_COMPLETE),
     SUBTASK_DELETE("🗑️ Удалить", CallbackType.SUBTASK_DELETE),
 
@@ -46,6 +50,19 @@ public enum KeyboardButton {
 
         return InlineKeyboardButton.builder()
                 .text(text)
+                .callbackData(CallbackDataMapper.toDataFromDto(callbackData))
+                .build();
+    }
+
+    public InlineKeyboardButton toButton(Long entityId, String customText) {
+
+        var callbackData = CallbackDto.builder()
+                .type(callbackType)
+                .entityId(entityId)
+                .build();
+
+        return InlineKeyboardButton.builder()
+                .text(customText)
                 .callbackData(CallbackDataMapper.toDataFromDto(callbackData))
                 .build();
     }
