@@ -1,8 +1,11 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service;
 
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.TaskStatusFilter;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.enums.KeyboardButton;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -35,63 +38,71 @@ public class KeyboardService {
         return keyboard(row(KeyboardButton.LIST_DONE.toButton()));
     }
 
-    public InlineKeyboardMarkup getTasksActionsKeyboard(Task task) {
+    public InlineKeyboardMarkup getTaskActionsKeyboard(Task task, CallbackType source) {
 
         List<InlineKeyboardRow> rows = new ArrayList<>();
 
         rows.add(row(
-                KeyboardButton.TASK_EDIT.toButton(task.getId()),
-                KeyboardButton.TASK_COMPLETE.toButton(task.getId()),
-                KeyboardButton.TASK_DELETE.toButton(task.getId())
+                KeyboardButton.TASK_EDIT.toButton(task.getId(), null, source),
+                KeyboardButton.TASK_COMPLETE.toButton(task.getId(), null, source),
+                KeyboardButton.TASK_DELETE.toButton(task.getId(), null, source)
         ));
 
         if (task.getSubtasks() != null && !task.getSubtasks().isEmpty()) {
             rows.add(row(
-                    KeyboardButton.OPEN_SUBTASKS.toButton(task.getId())
+                    KeyboardButton.OPEN_SUBTASKS.toButton(task.getId(), null, source)
             ));
         }
-
-        rows.add(row(
-                KeyboardButton.MAIN_MENU.toButton()
-        ));
+        rows.add(row(KeyboardButton.BACK_TO.backButton(source, null, null, source)));
 
         return keyboard(rows.toArray(new InlineKeyboardRow[0]));
     }
 
-    public InlineKeyboardMarkup getSubtaskSelectionKeyboard(List<Subtask> subtasks) {
+    public InlineKeyboardMarkup getTasksSelectionKeyboard(List<Task> tasks, TaskStatusFilter filter) {
+        List<InlineKeyboardRow> rows = new ArrayList<>();
+
+        var source = filter.toShowCallback();
+
+        for (Task task : tasks) {
+            var title = task.getTitle();
+
+            if (task.getStatus() == Status.DONE) {
+                title = "✅ " + title;
+            }
+            rows.add(row(KeyboardButton.SELECT_TASK.toButton(task.getId(), null, source, title)));
+        }
+
+        rows.add(row(KeyboardButton.MAIN_MENU.toButton()));
+
+        return keyboard(rows.toArray(new InlineKeyboardRow[0]));
+    }
+
+    public InlineKeyboardMarkup getSubtaskSelectionKeyboard(List<Subtask> subtasks, Long taskId,
+                                                            CallbackType source) {
 
         List<InlineKeyboardRow> rows = new ArrayList<>();
 
         for (Subtask subtask : subtasks) {
+            var title = subtask.getTitle();
+
+            if (subtask.getStatus() == Status.DONE) {
+                title = "✅ " + title;
+            }
+
             rows.add(row(
-                    KeyboardButton.SELECT_SUBTASK.toButton(subtask.getId(), subtask.getTitle())
+                    KeyboardButton.SELECT_SUBTASK.toButton(subtask.getId(), taskId, source, title)
             ));
         }
-
-        rows.add(row(
-                KeyboardButton.MAIN_MENU.toButton()
-        ));
+        rows.add(row(KeyboardButton.BACK_TO.backButton(CallbackType.SELECT_TASK, taskId, null, source)));
 
         return keyboard(rows.toArray(new InlineKeyboardRow[0]));
     }
 
-    public InlineKeyboardMarkup getSubtaskActionsKeyboard(Long subtaskId) {
+    public InlineKeyboardMarkup getSubtaskActionsKeyboard(Long subtaskId, Long taskId, CallbackType source) {
         return keyboard(
-                row(KeyboardButton.SUBTASK_COMPLETE.toButton(subtaskId),
-                    KeyboardButton.SUBTASK_DELETE.toButton(subtaskId)));
-    }
-
-    public InlineKeyboardMarkup getTaskSelectionKeyboard(List<Task> tasks) {
-        List<InlineKeyboardRow> rows = new ArrayList<>();
-
-        for (Task task : tasks) {
-            rows.add(row(
-                    KeyboardButton.SELECT_TASK.toButton(task.getId(), task.getTitle())
-            ));
-        }
-        rows.add(row(KeyboardButton.MAIN_MENU.toButton()));
-
-        return keyboard(rows.toArray(new InlineKeyboardRow[0]));
+                row(KeyboardButton.SUBTASK_COMPLETE.toButton(subtaskId, taskId, source),
+                    KeyboardButton.SUBTASK_DELETE.toButton(subtaskId, taskId, source)),
+                row(KeyboardButton.BACK_TO.backButton(CallbackType.OPEN_SUBTASKS, taskId, null, source)));
     }
 
     private InlineKeyboardRow row(InlineKeyboardButton... buttons) {

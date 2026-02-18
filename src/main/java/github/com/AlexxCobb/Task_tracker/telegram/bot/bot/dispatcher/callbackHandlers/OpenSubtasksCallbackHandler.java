@@ -30,6 +30,7 @@ public class OpenSubtasksCallbackHandler implements UpdateHandler {
 
         var chatId = context.chatId();
         var taskId = context.dto().getEntityId();
+        var source = context.dto().getSource();
 
         var task = taskService.getTaskForUser(chatId, taskId);
 
@@ -37,7 +38,7 @@ public class OpenSubtasksCallbackHandler implements UpdateHandler {
                 SendMessage.builder()
                         .chatId(chatId)
                         .text("📂 Подзадачи:")
-                        .replyMarkup(keyboardService.getSubtaskSelectionKeyboard(task.getSubtasks()))
+                        .replyMarkup(keyboardService.getSubtaskSelectionKeyboard(task.getSubtasks(), taskId, source))
                         .build()
         );
     }

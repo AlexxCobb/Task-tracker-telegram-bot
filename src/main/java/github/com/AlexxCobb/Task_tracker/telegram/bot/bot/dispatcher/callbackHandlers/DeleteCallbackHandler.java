@@ -37,7 +37,7 @@ public class DeleteCallbackHandler implements UpdateHandler {
         if (isTask) {
             taskService.removeTask(chatId, context.dto().getEntityId());
         } else {
-            taskService.removeSubtask(context.dto().getEntityId());
+            taskService.removeSubtask(chatId, context.dto().getEntityId());
         }
         dialogService.clearState(chatId);
 

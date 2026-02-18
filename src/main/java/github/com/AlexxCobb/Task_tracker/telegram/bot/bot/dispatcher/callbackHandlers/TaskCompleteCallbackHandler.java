@@ -34,7 +34,7 @@ public class TaskCompleteCallbackHandler implements UpdateHandler {
         if (isTask) {
             taskService.completeTask(chatId, context.dto().getEntityId());
         } else {
-            taskService.completeSubtask(context.dto().getEntityId());
+            taskService.completeSubtask(chatId, context.dto().getEntityId());
         }
 
         return List.of(SendMessage.builder()
