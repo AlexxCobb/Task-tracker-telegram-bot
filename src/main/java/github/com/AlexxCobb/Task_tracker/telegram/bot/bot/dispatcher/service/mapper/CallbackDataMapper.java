@@ -11,21 +11,20 @@ public final class CallbackDataMapper {
     }
 
     public static String toDataFromDto(CallbackDto dto) {
-        var sb = new StringBuilder();
-        sb.append(dto.getType()).append(":");
-        if (dto.getEntityId() != null) {
-            sb.append(dto.getEntityId());
-        }
-        return sb.toString();
+        return String.join(":",
+                           dto.getType().name(),
+                           dto.getEntityId() != null ? dto.getEntityId().toString() : "",
+                           dto.getParentId() != null ? dto.getParentId().toString() : "",
+                           dto.getSource() != null ? dto.getSource().name() : "");
     }
 
     public static CallbackDto toDtoFromData(String data) {
-        var strArray = data.split(":");
-        var type = CallbackType.valueOf(strArray[0]);
-        var entityId = strArray.length == 2 ? Long.valueOf(strArray[1]) : null;
+        var parts = data.split(":");
         return CallbackDto.builder()
-                .type(type)
-                .entityId(entityId)
+                .type(CallbackType.valueOf(parts[0]))
+                .entityId(parts.length > 1 && !parts[1].isBlank() ? Long.valueOf(parts[1]) : null)
+                .parentId(parts.length > 2 && !parts[2].isBlank() ? Long.valueOf(parts[2]) : null)
+                .source(parts.length > 3 && !parts[3].isBlank() ? CallbackType.valueOf(parts[3]) : null)
                 .build();
     }
 }

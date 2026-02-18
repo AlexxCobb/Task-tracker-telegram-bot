@@ -21,5 +21,15 @@ public enum CallbackType {
     SUBTASK_DELETE,
     SHOPPING_ITEM_TOGGLE,
     MAIN_MENU,
-    LIST_DONE
+    LIST_DONE,
+    BACK_TO;
+
+    public TaskStatusFilter toFilter() {
+        return switch (this) {
+            case SHOW_ACTIVE_TASKS -> TaskStatusFilter.ACTIVE;
+            case SHOW_COMPLETED_TASKS -> TaskStatusFilter.COMPLETED;
+            case SHOW_ALL_TASKS, SHOW_SHOPPING_LIST -> TaskStatusFilter.ALL;
+            default -> throw new IllegalStateException("Unexpected callback type: " + this);
+        };
+    }
 }
