@@ -8,7 +8,7 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
 import java.util.List;
 
@@ -31,12 +31,17 @@ public class OpenSubtasksCallbackHandler implements UpdateHandler {
         var chatId = context.chatId();
         var taskId = context.dto().getEntityId();
         var source = context.dto().getSource();
+        var messageId = context.update()
+                .getCallbackQuery()
+                .getMessage()
+                .getMessageId();
 
         var task = taskService.getTaskForUser(chatId, taskId);
 
         return List.of(
-                SendMessage.builder()
+                EditMessageText.builder()
                         .chatId(chatId)
+                        .messageId(messageId)
                         .text("📂 Подзадачи:")
                         .replyMarkup(keyboardService.getSubtaskSelectionKeyboard(task.getSubtasks(), taskId, source))
                         .build()

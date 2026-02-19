@@ -2,13 +2,12 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHa
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.UpdateContext;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.NavigationService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ import java.util.List;
 public class TaskCompleteCallbackHandler implements UpdateHandler {
 
     private final TaskService taskService;
-    private final KeyboardService keyboardService;
+    private final NavigationService navigationService;
 
     @Override
     public Boolean canHandle(UpdateContext context) {
@@ -37,10 +36,6 @@ public class TaskCompleteCallbackHandler implements UpdateHandler {
             taskService.completeSubtask(chatId, context.dto().getEntityId());
         }
 
-        return List.of(SendMessage.builder()
-                               .chatId(chatId)
-                               .text("✅ Задача выполнена!\n\nВыбери, что хочешь сделать:")
-                               .replyMarkup(keyboardService.getStartKeyboard())
-                               .build());
+        return List.of(navigationService.returnAfterMutation(context));
     }
 }

@@ -6,7 +6,6 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHan
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.UpdateContext;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TaskViewType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -39,26 +38,24 @@ public class ShowTasksAndListCallbackHandler implements UpdateHandler {
     public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
         var callbackType = context.dto().getType();
+        var messageId = context.update()
+                .getCallbackQuery()
+                .getMessage()
+                .getMessageId();
 
         var filter = callbackType.toFilter();
         if (filter == null) {
             filter = TaskStatusFilter.ALL;
         }
-        var viewType = callbackType == CallbackType.SHOW_SHOPPING_LIST
-                ? TaskViewType.SHOPPING_LIST
-                : TaskViewType.TASKS;
 
-        var tasks = taskService.getTasks(chatId, filter, viewType);
+        var tasks = taskService.getTasks(chatId, filter);
         var text = formatter.formatTask(tasks);
         var keyboard = keyboardService.getTasksSelectionKeyboard(tasks, filter);
 
         return List.of(
                 EditMessageText.builder()
                         .chatId(chatId)
-                        .messageId(context.update()
-                                           .getCallbackQuery()
-                                           .getMessage()
-                                           .getMessageId())
+                        .messageId(messageId)
                         .text(text)
                         .parseMode("Markdown")
                         .replyMarkup(keyboard)

@@ -33,6 +33,10 @@ public class SelectSubtaskCallbackHandler implements UpdateHandler {
         var subtaskId = context.dto().getEntityId();
         var taskId = context.dto().getParentId();
         var source = context.dto().getSource();
+        var messageId = context.update()
+                .getCallbackQuery()
+                .getMessage()
+                .getMessageId();
 
         var subtask = taskService.getSubtaskForUser(chatId, subtaskId);
         var text = formatter.formatSubtaskDetails(subtask);
@@ -41,10 +45,7 @@ public class SelectSubtaskCallbackHandler implements UpdateHandler {
         return List.of(
                 EditMessageText.builder()
                         .chatId(chatId)
-                        .messageId(context.update()
-                                           .getCallbackQuery()
-                                           .getMessage()
-                                           .getMessageId())
+                        .messageId(messageId)
                         .text(text)
                         .replyMarkup(keyboard)
                         .build()

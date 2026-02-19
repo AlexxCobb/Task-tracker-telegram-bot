@@ -15,6 +15,10 @@ public interface SubtaskRepository extends JpaRepository<Subtask, Long> {
     @Query("update Subtask s set s.status = DONE, s.updatedAt = CURRENT_TIMESTAMP where s.id = :id")
     int updateStatusToDone(Long id);
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Subtask s set s.status = DONE, s.updatedAt = CURRENT_TIMESTAMP where s.task.id = :taskId")
+    void updateAllByTaskIdToDone(Long taskId);
+
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Subtask s WHERE s.id = :subtaskId AND s.task.user.chatId = :chatId")
     int deleteByIdAndUserChatId(Long subtaskId, Long chatId);

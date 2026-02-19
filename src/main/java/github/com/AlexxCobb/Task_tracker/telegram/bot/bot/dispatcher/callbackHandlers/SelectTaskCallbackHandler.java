@@ -33,6 +33,10 @@ public class SelectTaskCallbackHandler implements UpdateHandler {
         var chatId = context.chatId();
         var taskId = context.dto().getEntityId();
         var source = context.dto().getSource();
+        var messageId = context.update()
+                .getCallbackQuery()
+                .getMessage()
+                .getMessageId();
 
         var task = taskService.getTaskForUser(chatId, taskId);
         var text = formatter.formatTaskDetails(task);
@@ -42,10 +46,7 @@ public class SelectTaskCallbackHandler implements UpdateHandler {
         return List.of(
                 EditMessageText.builder()
                         .chatId(chatId)
-                        .messageId(context.update()
-                                           .getCallbackQuery()
-                                           .getMessage()
-                                           .getMessageId())
+                        .messageId(messageId)
                         .text(text)
                         .replyMarkup(keyboard)
                         .build()
