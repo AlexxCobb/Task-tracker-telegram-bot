@@ -2,7 +2,9 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.TaskStatusFilter;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.enums.KeyboardButton;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
@@ -103,6 +105,33 @@ public class KeyboardService {
                 row(KeyboardButton.SUBTASK_COMPLETE.toButton(subtaskId, taskId, source),
                     KeyboardButton.SUBTASK_DELETE.toButton(subtaskId, taskId, source)),
                 row(KeyboardButton.BACK_TO.backButton(CallbackType.OPEN_SUBTASKS, taskId, null, source)));
+    }
+
+    public InlineKeyboardMarkup buildBackKeyboard(CallbackType source, Long parentId) {
+
+        CallbackDto backDto;
+
+        if (source == CallbackType.OPEN_SUBTASKS) {
+            backDto = CallbackDto.builder()
+                    .type(CallbackType.OPEN_SUBTASKS)
+                    .entityId(parentId)
+                    .source(source)
+                    .build();
+        } else {
+            backDto = CallbackDto.builder()
+                    .type(source)
+                    .source(source)
+                    .build();
+        }
+
+        var button = InlineKeyboardButton.builder()
+                .text("⬅ Назад")
+                .callbackData(CallbackDataMapper.toDataFromDto(backDto))
+                .build();
+
+        return InlineKeyboardMarkup.builder()
+                .keyboard(List.of(new InlineKeyboardRow(List.of(button))))
+                .build();
     }
 
     private InlineKeyboardRow row(InlineKeyboardButton... buttons) {

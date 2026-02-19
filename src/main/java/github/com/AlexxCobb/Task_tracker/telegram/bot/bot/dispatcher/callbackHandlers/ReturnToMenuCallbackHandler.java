@@ -8,7 +8,7 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
 import java.util.List;
 
@@ -28,6 +28,10 @@ public class ReturnToMenuCallbackHandler implements UpdateHandler {
     @Override
     public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
+        var messageId = context.update()
+                .getCallbackQuery()
+                .getMessage()
+                .getMessageId();
 
         dialogService.clearState(chatId);
 
@@ -35,10 +39,13 @@ public class ReturnToMenuCallbackHandler implements UpdateHandler {
                 context.dto().getType() == CallbackType.LIST_DONE ? "✅ Список сохранен!\n\nВыбери, что хочешь сделать:"
                         : "\nВыбери, что хочешь сделать:";
 
-        return List.of(SendMessage.builder()
-                               .chatId(chatId)
-                               .text(text)
-                               .replyMarkup(keyboardService.getStartKeyboard())
-                               .build());
+        return List.of(
+                EditMessageText.builder()
+                        .chatId(chatId)
+                        .messageId(messageId)
+                        .text(text)
+                        .replyMarkup(keyboardService.getStartKeyboard())
+                        .build()
+        );
     }
 }

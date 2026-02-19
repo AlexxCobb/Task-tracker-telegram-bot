@@ -4,7 +4,6 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHan
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TaskViewType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TypeOfTask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.SubtaskRepository;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.TaskRepository;
@@ -94,6 +93,9 @@ public class TaskService {
         if (updated == 0) {
             throw new ForbiddenException();
         }
+        if (task.getType() == TypeOfTask.EPIC_TASK) {
+            subtaskRepository.updateAllByTaskIdToDone(taskId);
+        }
     }
 
     @Transactional
@@ -118,12 +120,10 @@ public class TaskService {
         return subtaskRepository.findByIdAndUserChatId(subtaskId, chatId).orElseThrow(SubtaskNotFoundException::new);
     }
 
-    public List<Task> getTasks(Long chatId, @NonNull TaskStatusFilter filter, TaskViewType type) {
+    public List<Task> getTasks(Long chatId, @NonNull TaskStatusFilter filter) {
         //маппинг фильтра и типа
-        var isShoppingList = type == TaskViewType.SHOPPING_LIST;
         return switch (filter) {
-            case ALL -> isShoppingList ? taskRepository.findUserShoppingList(chatId)
-                    : taskRepository.findAllUserTasks(chatId);
+            case ALL -> taskRepository.findAllUserTasks(chatId);
             case ACTIVE -> taskRepository.findUserTasksWithStatus(chatId, Status.NEW);
             case COMPLETED -> taskRepository.findUserTasksWithStatus(chatId, Status.DONE);
         };
