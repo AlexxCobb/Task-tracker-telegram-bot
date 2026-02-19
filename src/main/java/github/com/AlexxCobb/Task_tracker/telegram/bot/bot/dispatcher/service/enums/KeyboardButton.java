@@ -20,15 +20,16 @@ public enum KeyboardButton {
     TASK_COMPLETE("✅ Завершить", CallbackType.TASK_COMPLETE),
     TASK_DELETE("🗑️ Удалить", CallbackType.TASK_DELETE),
 
-    SELECT_TASK("Выбери задачу",CallbackType.SELECT_TASK),
-    SELECT_SUBTASK("Выбери подзадачу",CallbackType.SELECT_SUBTASK),
+    SELECT_TASK("Выбери задачу", CallbackType.SELECT_TASK),
+    SELECT_SUBTASK("Выбери подзадачу", CallbackType.SELECT_SUBTASK),
     OPEN_SUBTASKS("📂 Открыть подзадачи", CallbackType.OPEN_SUBTASKS),
 
     SUBTASK_COMPLETE("✅ Выполнено", CallbackType.SUBTASK_COMPLETE),
     SUBTASK_DELETE("🗑️ Удалить", CallbackType.SUBTASK_DELETE),
 
     MAIN_MENU("В главное меню", CallbackType.MAIN_MENU),
-    LIST_DONE("Список составлен", CallbackType.LIST_DONE);
+    LIST_DONE("Список составлен", CallbackType.LIST_DONE),
+    BACK_TO("⬅ Назад", CallbackType.BACK_TO);
 
     private final String text;
     private final CallbackType callbackType;
@@ -54,16 +55,60 @@ public enum KeyboardButton {
                 .build();
     }
 
-    public InlineKeyboardButton toButton(Long entityId, String customText) {
+    public InlineKeyboardButton toButton(
+            Long entityId,
+            Long parentId,
+            CallbackType source
+    ) {
 
         var callbackData = CallbackDto.builder()
                 .type(callbackType)
                 .entityId(entityId)
+                .parentId(parentId)
+                .source(source)
+                .build();
+
+        return InlineKeyboardButton.builder()
+                .text(text)
+                .callbackData(CallbackDataMapper.toDataFromDto(callbackData))
+                .build();
+    }
+
+    public InlineKeyboardButton toButton(
+            Long entityId,
+            Long parentId,
+            CallbackType source,
+            String customText
+    ) {
+        var callbackData = CallbackDto.builder()
+                .type(callbackType)
+                .entityId(entityId)
+                .parentId(parentId)
+                .source(source)
                 .build();
 
         return InlineKeyboardButton.builder()
                 .text(customText)
                 .callbackData(CallbackDataMapper.toDataFromDto(callbackData))
+                .build();
+    }
+
+    public InlineKeyboardButton backButton(
+            CallbackType backType,
+            Long entityId,
+            Long parentId,
+            CallbackType source
+    ) {
+        var dto = CallbackDto.builder()
+                .type(backType)
+                .entityId(entityId)
+                .parentId(parentId)
+                .source(source)
+                .build();
+
+        return InlineKeyboardButton.builder()
+                .text(text)
+                .callbackData(CallbackDataMapper.toDataFromDto(dto))
                 .build();
     }
 }

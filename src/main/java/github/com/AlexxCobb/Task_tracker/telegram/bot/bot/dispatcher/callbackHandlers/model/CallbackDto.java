@@ -9,4 +9,6 @@ import lombok.Getter;
 public class CallbackDto {
     private CallbackType type;
     private Long entityId;
+    private Long parentId;
+    private CallbackType source;
 }

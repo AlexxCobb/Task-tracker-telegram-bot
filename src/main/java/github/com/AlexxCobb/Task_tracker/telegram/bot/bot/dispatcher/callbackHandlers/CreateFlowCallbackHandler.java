@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
 import java.util.List;
 import java.util.Map;
@@ -37,12 +37,19 @@ public class CreateFlowCallbackHandler implements UpdateHandler {
     public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
         var config = FLOW_CONFIG.get(context.dto().getType());
+        var messageId = context.update()
+                .getCallbackQuery()
+                .getMessage()
+                .getMessageId();
 
         dialogService.setDialogState(chatId, config.getFirst(), null);
 
-        return List.of(SendMessage.builder()
-                               .chatId(chatId)
-                               .text(config.getSecond())
-                               .build());
+        return List.of(
+                EditMessageText.builder()
+                        .chatId(chatId)
+                        .messageId(messageId)
+                        .text(config.getSecond())
+                        .build()
+        );
     }
 }

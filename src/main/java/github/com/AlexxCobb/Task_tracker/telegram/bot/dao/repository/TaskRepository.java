@@ -39,7 +39,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Task t set t.status = DONE, t.updatedAt = CURRENT_TIMESTAMP where t.id = :id and t.user.chatId = :chatId")
-    int updateStatus(Long id, Long chatId);
+    int updateStatusToDone(Long id, Long chatId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Task t WHERE t.id = :taskId AND t.user.chatId = :chatId")

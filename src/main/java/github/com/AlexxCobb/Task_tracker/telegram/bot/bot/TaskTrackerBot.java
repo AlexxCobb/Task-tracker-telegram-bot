@@ -10,6 +10,7 @@ import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsume
 import org.telegram.telegrambots.longpolling.starter.AfterBotRegistration;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -42,20 +43,16 @@ public class TaskTrackerBot implements SpringLongPollingBot, LongPollingSingleTh
 
     @Override
     public void consume(Update update) {
-        var messages = dispatcher.dispatch(update);
-       messages.forEach(message ->{
-           if(message instanceof SendMessage sendMessage){
-               sendMessage(sendMessage);
-           }
-       });
+        dispatcher.dispatch(update)
+                .forEach(method -> executeSafely((BotApiMethod<?>) method));
     }
 
 
-    private void sendMessage(SendMessage sendMessage) {
+    private void executeSafely(BotApiMethod<?> method) {
         try {
-            telegramClient.execute(sendMessage);
+            telegramClient.execute(method);
         } catch (TelegramApiException e) {
-            log.error("Error sending message: {}", e.getMessage());
+            log.error("Telegram API error", e);
         }
     }
 
