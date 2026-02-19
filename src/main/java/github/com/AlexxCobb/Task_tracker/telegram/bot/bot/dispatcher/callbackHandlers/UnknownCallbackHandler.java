@@ -4,7 +4,7 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHan
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.UpdateHandler;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
 import java.util.List;
 
@@ -19,10 +19,17 @@ public class UnknownCallbackHandler implements UpdateHandler {
     @Override
     public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
+        var messageId = context.update()
+                .getCallbackQuery()
+                .getMessage()
+                .getMessageId();
 
-        return List.of(SendMessage.builder()
-                               .chatId(chatId)
-                               .text("Произошла ошибка")
-                               .build());
+        return List.of(
+                EditMessageText.builder()
+                        .chatId(chatId)
+                        .messageId(messageId)
+                        .text("Произошла ошибка")
+                        .build()
+        );
     }
 }

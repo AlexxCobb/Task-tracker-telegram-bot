@@ -9,7 +9,7 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
 import java.util.List;
 
@@ -31,14 +31,23 @@ public class SelectSubtaskCallbackHandler implements UpdateHandler {
 
         var chatId = context.chatId();
         var subtaskId = context.dto().getEntityId();
+        var taskId = context.dto().getParentId();
+        var source = context.dto().getSource();
+        var messageId = context.update()
+                .getCallbackQuery()
+                .getMessage()
+                .getMessageId();
 
-        var subtask = taskService.getSubtaskForUser(subtaskId);
+        var subtask = taskService.getSubtaskForUser(chatId, subtaskId);
+        var text = formatter.formatSubtaskDetails(subtask);
+        var keyboard = keyboardService.getSubtaskActionsKeyboard(subtaskId, taskId, source);
 
         return List.of(
-                SendMessage.builder()
+                EditMessageText.builder()
                         .chatId(chatId)
-                        .text(formatter.formatSubtaskDetails(subtask))
-                        .replyMarkup(keyboardService.getSubtaskActionsKeyboard(subtaskId))
+                        .messageId(messageId)
+                        .text(text)
+                        .replyMarkup(keyboard)
                         .build()
         );
     }
