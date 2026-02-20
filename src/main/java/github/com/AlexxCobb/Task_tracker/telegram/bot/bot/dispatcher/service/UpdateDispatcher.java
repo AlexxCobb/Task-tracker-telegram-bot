@@ -3,7 +3,7 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.UpdateContext;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.exceptionHandlers.ExceptionHandler;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.UserService;
 import lombok.RequiredArgsConstructor;

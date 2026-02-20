@@ -38,10 +38,10 @@ public class SelectTaskCallbackHandler implements UpdateHandler {
                 .getMessage()
                 .getMessageId();
 
-        var task = taskService.getTaskForUser(chatId, taskId);
-        var text = formatter.formatTaskDetails(task);
+        var taskDetails = taskService.getTaskForUser(chatId, taskId);
+        var text = formatter.formatTaskDetails(taskDetails);
 
-        var keyboard = keyboardService.getTaskActionsKeyboard(task, source);
+        var keyboard = keyboardService.getTaskActionsKeyboard(taskDetails, source);
 
         return List.of(
                 EditMessageText.builder()

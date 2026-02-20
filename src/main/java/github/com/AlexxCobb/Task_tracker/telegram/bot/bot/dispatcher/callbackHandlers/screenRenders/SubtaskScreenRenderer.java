@@ -31,7 +31,7 @@ public class SubtaskScreenRenderer {
                 .text("📂 Обновленный список подзадач:")
                 .replyMarkup(
                         keyboardService.getSubtaskSelectionKeyboard(
-                                task.getSubtasks(),
+                                task.subtasks(),
                                 dto.getParentId(),
                                 dto.getSource()
                         )

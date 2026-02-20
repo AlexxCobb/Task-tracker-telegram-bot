@@ -5,12 +5,16 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.TypeOfTask;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.mappers.SubtaskMapper;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.mappers.TaskMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.SubtaskRepository;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.TaskRepository;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.AlreadyCompleteException;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.ForbiddenException;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.SubtaskNotFoundException;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.TaskNotFoundException;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.model.SubtaskDetails;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.model.TaskDetails;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,8 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final SubtaskRepository subtaskRepository;
     private final UserService userService;
+    private final TaskMapper taskMapper;
+    private final SubtaskMapper subtaskMapper;
 
     @Transactional
     public Long createTask(Long chatId, String title) {
@@ -112,20 +118,23 @@ public class TaskService {
         checkTaskStatusWithSubtasks(subtask.getTask().getId());
     }
 
-    public Task getTaskForUser(Long chatId, Long taskId) {
-        return taskRepository.findUserChatIdAndById(chatId, taskId).orElseThrow(TaskNotFoundException::new);
+    public TaskDetails getTaskForUser(Long chatId, Long taskId) {
+        var task = taskRepository.findUserChatIdAndById(chatId, taskId).orElseThrow(TaskNotFoundException::new);
+        return taskMapper.toTaskDetails(task);
     }
 
-    public Subtask getSubtaskForUser(Long chatId, Long subtaskId) {
-        return subtaskRepository.findByIdAndUserChatId(subtaskId, chatId).orElseThrow(SubtaskNotFoundException::new);
+    public SubtaskDetails getSubtaskForUser(Long chatId, Long subtaskId) {
+        var subtask =
+                subtaskRepository.findByIdAndUserChatId(subtaskId, chatId).orElseThrow(SubtaskNotFoundException::new);
+        return subtaskMapper.toSubtaskDetails(subtask);
     }
 
-    public List<Task> getTasks(Long chatId, @NonNull TaskStatusFilter filter) {
+    public List<TaskDetails> getTasks(Long chatId, @NonNull TaskStatusFilter filter) {
         //маппинг фильтра и типа
         return switch (filter) {
-            case ALL -> taskRepository.findAllUserTasks(chatId);
-            case ACTIVE -> taskRepository.findUserTasksWithStatus(chatId, Status.NEW);
-            case COMPLETED -> taskRepository.findUserTasksWithStatus(chatId, Status.DONE);
+            case ALL -> taskMapper.toTaskDetailsList(taskRepository.findAllUserTasks(chatId));
+            case ACTIVE -> taskMapper.toTaskDetailsList(taskRepository.findUserTasksWithStatus(chatId, Status.NEW));
+            case COMPLETED -> taskMapper.toTaskDetailsList(taskRepository.findUserTasksWithStatus(chatId, Status.DONE));
         };
     }
 
@@ -139,10 +148,14 @@ public class TaskService {
 
     @Transactional
     public void removeSubtask(Long chatId, Long subtaskId) {
+        var subtask =
+                subtaskRepository.findByIdAndUserChatId(subtaskId, chatId).orElseThrow(SubtaskNotFoundException::new);
+        var taskId = subtask.getTask().getId();
         int deleted = subtaskRepository.deleteByIdAndUserChatId(subtaskId, chatId);
         if (deleted == 0) {
             throw new ForbiddenException();
         }
+        checkTaskStatusWithSubtasks(taskId);
     }
 
     private Task getTaskById(Long taskId) {
