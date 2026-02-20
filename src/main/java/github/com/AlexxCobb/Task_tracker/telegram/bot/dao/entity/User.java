@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +25,16 @@ public class User {
 
     private String name;
 
-    public void updateName(String newName){
-        this.name = newName;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return chatId != null && Objects.equals(chatId, user.chatId);
+    }
+
+    @Override
+    public int hashCode() {
+        return chatId != null ? chatId.hashCode() : super.hashCode();
     }
 }

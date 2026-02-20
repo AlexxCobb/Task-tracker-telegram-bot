@@ -1,8 +1,8 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.formatter;
 
-import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.model.SubtaskDetails;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.model.TaskDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
 @Component
 public class TaskMessageFormatter {
 
-    public String formatTask(List<Task> tasks) {
+    public String formatTask(List<TaskDetails> tasks) {
 
         if (tasks.isEmpty()) {
             return "📭 У вас пока нет задач";
@@ -20,19 +20,19 @@ public class TaskMessageFormatter {
 
         for (int i = 0; i < tasks.size(); i++) {
             var task = tasks.get(i);
-            var status = task.getStatus() == Status.DONE ? "✅" : "⏳";
+            var status = task.status() == Status.DONE ? "✅" : "⏳";
 
             sb.append(i + 1)
                     .append(". ")
-                    .append(task.getTitle())
+                    .append(task.title())
                     .append(" ")
                     .append(status)
                     .append("\n");
-            if (task.getSubtasks() != null && !task.getSubtasks().isEmpty()) {
-                for (var sub : task.getSubtasks()) {
-                    var subStatus = sub.getStatus() == Status.DONE ? "   └ ✅ " : "   └ ⏳ ";
+            if (task.subtasks() != null && !task.subtasks().isEmpty()) {
+                for (var sub : task.subtasks()) {
+                    var subStatus = sub.status() == Status.DONE ? "   └ ✅ " : "   └ ⏳ ";
                     sb.append(subStatus)
-                            .append(sub.getTitle())
+                            .append(sub.title())
                             .append("\n");
                 }
             }
@@ -42,28 +42,28 @@ public class TaskMessageFormatter {
         return sb.toString();
     }
 
-    public String formatTaskDetails(Task task) {
+    public String formatTaskDetails(TaskDetails taskDetails) {
 
         var sb = new StringBuilder();
-        var status = task.getStatus() == Status.DONE ? "✅" : "⏳";
+        var status = taskDetails.status() == Status.DONE ? "✅" : "⏳";
 
         sb.append("📌 ")
-                .append(task.getTitle())
+                .append(taskDetails.title())
                 .append(" ")
                 .append(status)
                 .append("\n\n");
 
-        if (task.getSubtasks() != null && !task.getSubtasks().isEmpty()) {
+        if (taskDetails.subtasks() != null && !taskDetails.subtasks().isEmpty()) {
 
             sb.append("Подзадачи:\n\n");
 
-            for (int i = 0; i < task.getSubtasks().size(); i++) {
-                var sub = task.getSubtasks().get(i);
-                var subStatus = sub.getStatus() == Status.DONE ? "✅" : "⏳";
+            for (int i = 0; i < taskDetails.subtasks().size(); i++) {
+                var sub = taskDetails.subtasks().get(i);
+                var subStatus = sub.status() == Status.DONE ? "✅" : "⏳";
 
                 sb.append(i + 1)
                         .append(". ")
-                        .append(sub.getTitle())
+                        .append(sub.title())
                         .append(" ")
                         .append(subStatus)
                         .append("\n");
@@ -73,13 +73,13 @@ public class TaskMessageFormatter {
         return sb.toString();
     }
 
-    public String formatSubtaskDetails(Subtask subtask) {
+    public String formatSubtaskDetails(SubtaskDetails subtaskDetails) {
 
         var sb = new StringBuilder();
-        var status = subtask.getStatus() == Status.DONE ? "✅" : "⏳";
+        var status = subtaskDetails.status() == Status.DONE ? "✅" : "⏳";
 
         sb.append("📌 ")
-                .append(subtask.getTitle())
+                .append(subtaskDetails.title())
                 .append(" ")
                 .append(status)
                 .append("\n\n");

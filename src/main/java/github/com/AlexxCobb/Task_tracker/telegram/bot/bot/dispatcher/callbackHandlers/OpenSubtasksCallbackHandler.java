@@ -43,7 +43,7 @@ public class OpenSubtasksCallbackHandler implements UpdateHandler {
                         .chatId(chatId)
                         .messageId(messageId)
                         .text("📂 Подзадачи:")
-                        .replyMarkup(keyboardService.getSubtaskSelectionKeyboard(task.getSubtasks(), taskId, source))
+                        .replyMarkup(keyboardService.getSubtaskSelectionKeyboard(task.subtasks(), taskId, source))
                         .build()
         );
     }
