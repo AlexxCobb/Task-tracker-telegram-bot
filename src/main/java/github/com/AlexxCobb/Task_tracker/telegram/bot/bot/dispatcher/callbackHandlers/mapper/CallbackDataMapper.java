@@ -1,10 +1,8 @@
-package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper;
+package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.mapper;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
-import org.springframework.stereotype.Component;
 
-@Component
 public final class CallbackDataMapper {
 
     private CallbackDataMapper() {

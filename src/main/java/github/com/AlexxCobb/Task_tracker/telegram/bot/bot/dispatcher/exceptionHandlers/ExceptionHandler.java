@@ -1,7 +1,7 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.exceptionHandlers;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.BotException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
