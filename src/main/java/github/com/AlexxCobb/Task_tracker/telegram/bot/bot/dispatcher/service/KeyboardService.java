@@ -2,12 +2,12 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.TaskStatusFilter;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.enums.KeyboardButton;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.mapper.CallbackDataMapper;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.model.SubtaskDetails;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.model.TaskDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -40,19 +40,19 @@ public class KeyboardService {
         return keyboard(row(KeyboardButton.LIST_DONE.toButton()));
     }
 
-    public InlineKeyboardMarkup getTaskActionsKeyboard(Task task, CallbackType source) {
+    public InlineKeyboardMarkup getTaskActionsKeyboard(TaskDetails taskDetails, CallbackType source) {
 
         List<InlineKeyboardRow> rows = new ArrayList<>();
 
         rows.add(row(
-                KeyboardButton.TASK_EDIT.toButton(task.getId(), null, source),
-                KeyboardButton.TASK_COMPLETE.toButton(task.getId(), null, source),
-                KeyboardButton.TASK_DELETE.toButton(task.getId(), null, source)
+                KeyboardButton.TASK_EDIT.toButton(taskDetails.id(), null, source),
+                KeyboardButton.TASK_COMPLETE.toButton(taskDetails.id(), null, source),
+                KeyboardButton.TASK_DELETE.toButton(taskDetails.id(), null, source)
         ));
 
-        if (task.getSubtasks() != null && !task.getSubtasks().isEmpty()) {
+        if (taskDetails.subtasks() != null && !taskDetails.subtasks().isEmpty()) {
             rows.add(row(
-                    KeyboardButton.OPEN_SUBTASKS.toButton(task.getId(), null, source)
+                    KeyboardButton.OPEN_SUBTASKS.toButton(taskDetails.id(), null, source)
             ));
         }
         rows.add(row(KeyboardButton.BACK_TO.backButton(source, null, null, source)));
@@ -60,18 +60,18 @@ public class KeyboardService {
         return keyboard(rows.toArray(new InlineKeyboardRow[0]));
     }
 
-    public InlineKeyboardMarkup getTasksSelectionKeyboard(List<Task> tasks, TaskStatusFilter filter) {
+    public InlineKeyboardMarkup getTasksSelectionKeyboard(List<TaskDetails> tasks, TaskStatusFilter filter) {
         List<InlineKeyboardRow> rows = new ArrayList<>();
 
         var source = filter.toShowCallback();
 
-        for (Task task : tasks) {
-            var title = task.getTitle();
+        for (TaskDetails task : tasks) {
+            var title = task.title();
 
-            if (task.getStatus() == Status.DONE) {
+            if (task.status() == Status.DONE) {
                 title = "✅ " + title;
             }
-            rows.add(row(KeyboardButton.SELECT_TASK.toButton(task.getId(), null, source, title)));
+            rows.add(row(KeyboardButton.SELECT_TASK.toButton(task.id(), null, source, title)));
         }
 
         rows.add(row(KeyboardButton.MAIN_MENU.toButton()));
@@ -79,20 +79,20 @@ public class KeyboardService {
         return keyboard(rows.toArray(new InlineKeyboardRow[0]));
     }
 
-    public InlineKeyboardMarkup getSubtaskSelectionKeyboard(List<Subtask> subtasks, Long taskId,
+    public InlineKeyboardMarkup getSubtaskSelectionKeyboard(List<SubtaskDetails> subtasks, Long taskId,
                                                             CallbackType source) {
 
         List<InlineKeyboardRow> rows = new ArrayList<>();
 
-        for (Subtask subtask : subtasks) {
-            var title = subtask.getTitle();
+        for (SubtaskDetails subtask : subtasks) {
+            var title = subtask.title();
 
-            if (subtask.getStatus() == Status.DONE) {
+            if (subtask.status() == Status.DONE) {
                 title = "✅ " + title;
             }
 
             rows.add(row(
-                    KeyboardButton.SELECT_SUBTASK.toButton(subtask.getId(), taskId, source, title)
+                    KeyboardButton.SELECT_SUBTASK.toButton(subtask.id(), taskId, source, title)
             ));
         }
         rows.add(row(KeyboardButton.BACK_TO.backButton(CallbackType.SELECT_TASK, taskId, null, source)));

@@ -38,8 +38,8 @@ public class SelectSubtaskCallbackHandler implements UpdateHandler {
                 .getMessage()
                 .getMessageId();
 
-        var subtask = taskService.getSubtaskForUser(chatId, subtaskId);
-        var text = formatter.formatSubtaskDetails(subtask);
+        var subtaskDetails = taskService.getSubtaskForUser(chatId, subtaskId);
+        var text = formatter.formatSubtaskDetails(subtaskDetails);
         var keyboard = keyboardService.getSubtaskActionsKeyboard(subtaskId, taskId, source);
 
         return List.of(

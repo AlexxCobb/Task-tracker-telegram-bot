@@ -48,9 +48,9 @@ public class ShowTasksAndListCallbackHandler implements UpdateHandler {
             filter = TaskStatusFilter.ALL;
         }
 
-        var tasks = taskService.getTasks(chatId, filter);
-        var text = formatter.formatTask(tasks);
-        var keyboard = keyboardService.getTasksSelectionKeyboard(tasks, filter);
+        var taskDetailsList = taskService.getTasks(chatId, filter);
+        var text = formatter.formatTask(taskDetailsList);
+        var keyboard = keyboardService.getTasksSelectionKeyboard(taskDetailsList, filter);
 
         return List.of(
                 EditMessageText.builder()

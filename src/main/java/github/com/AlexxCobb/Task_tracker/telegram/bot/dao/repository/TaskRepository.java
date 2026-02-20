@@ -15,8 +15,6 @@ import java.util.Optional;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    Optional<Task> findById(@NotNull Long taskId);
-
     @EntityGraph(attributePaths = "subtasks")
     @Query("select t FROM Task t WHERE t.user.chatId = :chatId AND t.id = :taskId ")
     Optional<Task> findUserChatIdAndById(Long chatId, Long taskId);

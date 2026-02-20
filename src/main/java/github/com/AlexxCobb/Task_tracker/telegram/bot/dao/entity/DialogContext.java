@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -37,4 +38,17 @@ public class DialogContext {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DialogContext that = (DialogContext) o;
+        return chatId != null && Objects.equals(chatId, that.chatId);
+    }
+
+    @Override
+    public int hashCode() {
+        return chatId != null ? chatId.hashCode() : super.hashCode();
+    }
 }
