@@ -147,6 +147,14 @@ public class TaskService {
     }
 
     @Transactional
+    public void removeCompletedTasks(Long chatId) {
+        int deleted =  taskRepository.deleteByUserChatIdAndStatus(chatId, Status.DONE);
+        if (deleted == 0) {
+            throw new TaskNotFoundException();
+        }
+    }
+
+    @Transactional
     public void removeSubtask(Long chatId, Long subtaskId) {
         var subtask =
                 subtaskRepository.findByIdAndUserChatId(subtaskId, chatId).orElseThrow(SubtaskNotFoundException::new);

@@ -19,23 +19,29 @@ public class UserService {
     }
 
     @Transactional
-    public void ensureUser(Update update) {
+    public boolean ensureUser(Update update) {
         if (!update.hasMessage() || update.getMessage().getFrom() == null) {
-            return;
+            return false;
         }
 
         var chatId = update.getMessage().getChatId();
         var tgUser = update.getMessage().getFrom();
 
-        userRepository.findById(chatId)
-                .map(user -> {
-                    if (!user.getName().equals(tgUser.getUserName())) {
-                        userRepository.updateNameByChatId(tgUser.getUserName(), chatId);
-                    }
-                    return user;
-                }).orElseGet(() -> {
-                    var newUser = User.builder().chatId(chatId).name(tgUser.getUserName()).build();
-                    return userRepository.save(newUser);
-                });
+        var existing = userRepository.findById(chatId);
+        if (existing.isPresent()) {
+            String currentName = existing.get().getName();
+            String newName = tgUser.getUserName();
+            if (newName != null && !newName.equals(currentName)) {
+                userRepository.updateNameByChatId(newName, chatId);
+            }
+            return false;
+        } else {
+            var newUser = User.builder()
+                    .chatId(chatId)
+                    .name(tgUser.getUserName())
+                    .build();
+            userRepository.save(newUser);
+            return true;
+        }
     }
 }

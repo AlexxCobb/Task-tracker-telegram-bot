@@ -2,7 +2,6 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -42,4 +41,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Task t WHERE t.id = :taskId AND t.user.chatId = :chatId")
     int deleteByIdAndUserChatId(Long taskId, Long chatId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM Task t WHERE t.user.chatId = :chatId AND t.status = :status")
+    int deleteByUserChatIdAndStatus(Long chatId, Status status);
+
 }
