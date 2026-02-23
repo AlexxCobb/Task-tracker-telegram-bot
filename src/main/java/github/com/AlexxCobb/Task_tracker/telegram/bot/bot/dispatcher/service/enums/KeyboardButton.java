@@ -29,6 +29,7 @@ public enum KeyboardButton {
 
     MAIN_MENU("В главное меню", CallbackType.MAIN_MENU),
     LIST_DONE("Список составлен", CallbackType.LIST_DONE),
+    DELETE_COMPLETED_TASKS("Удалить выполненные задачи", CallbackType.DELETE_COMPLETED_TASKS),
     BACK_TO("⬅ Назад", CallbackType.BACK_TO);
 
     private final String text;

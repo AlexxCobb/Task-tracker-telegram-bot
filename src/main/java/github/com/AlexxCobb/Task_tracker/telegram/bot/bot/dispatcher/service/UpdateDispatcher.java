@@ -1,9 +1,9 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service;
 
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.UpdateContext;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.exceptionHandlers.ExceptionHandler;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +26,13 @@ public class UpdateDispatcher {
     public List<PartialBotApiMethod<?>> dispatch(Update update) {
         try {
             var chatId = extractChatId(update);
-            userService.ensureUser(update);
+            var isNewUser = userService.ensureUser(update);
 
             var dto = parseDto(update);
             var dialogState = dialogService.getStateOrDefault(chatId);
-            var context = new UpdateContext(update, chatId, dto, dialogState);
+            var context = new UpdateContext(update, chatId, dto, dialogState, isNewUser);
 
-            return handlers.stream()
+             return handlers.stream()
                     .filter(h -> h.canHandle(context))
                     .findFirst()
                     .map(h -> h.handle(context))

@@ -22,6 +22,7 @@ public enum CallbackType {
     SHOPPING_ITEM_TOGGLE,
     MAIN_MENU,
     LIST_DONE,
+    DELETE_COMPLETED_TASKS,
     BACK_TO;
 
     public TaskStatusFilter toFilter() {

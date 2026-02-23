@@ -8,7 +8,8 @@ public record UpdateContext(
         Update update,
         Long chatId,
         CallbackDto dto,
-        DialogState dialogState
+        DialogState dialogState,
+        boolean isNewUser
 ) {
 
     public String getText() {
