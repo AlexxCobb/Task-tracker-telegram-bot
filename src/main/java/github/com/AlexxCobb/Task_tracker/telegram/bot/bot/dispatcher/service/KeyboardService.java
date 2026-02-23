@@ -74,6 +74,10 @@ public class KeyboardService {
             rows.add(row(KeyboardButton.SELECT_TASK.toButton(task.id(), null, source, title)));
         }
 
+        if (filter.equals(TaskStatusFilter.COMPLETED) && !tasks.isEmpty()) {
+            rows.add(row(KeyboardButton.DELETE_COMPLETED_TASKS.toButton(null, null, source)));
+        }
+
         rows.add(row(KeyboardButton.MAIN_MENU.toButton()));
 
         return keyboard(rows.toArray(new InlineKeyboardRow[0]));
