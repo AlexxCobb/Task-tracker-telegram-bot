@@ -25,17 +25,38 @@ public class StartCommandHandler implements UpdateHandler {
     @Override
     public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
-        return List.of(SendMessage.builder()
-                               .chatId(chatId)
-                               .text("""
-                                             Привет! 👋
-                                             Я помогу тебе:
-                                             • создавать задачи
-                                             • вести списки покупок
-                                             • отмечать выполненное
-                                             
-                                             Выбери, что хочешь сделать:
-                                             """)
-                               .replyMarkup(keyboardService.getStartKeyboard()).build());
+        var user = context.update().getMessage().getFrom();
+        var firstName = user.getFirstName() != null ? user.getFirstName() : "друг";
+
+        String text = context.isNewUser()
+                ? """
+              *Привет, %s\\!* 👋
+              
+              Добро пожаловать в *Task Tracker* 📋
+              
+              Я помогу тебе:
+              • создавать задачи  
+              • добавлять подзадачи  
+              • вести список покупок 🛒  
+              • отмечать выполненное ✅  
+              
+              Выбери действие ниже 👇
+              """.formatted(firstName)
+                : """
+              *С возвращением, %s\\!* 👋
+              
+              Рад снова видеть тебя 😎  
+              
+              Продолжим управлять задачами?
+              """.formatted(firstName);
+
+        return List.of(
+                SendMessage.builder()
+                        .chatId(chatId)
+                        .text(text)
+                        .parseMode("MarkdownV2")
+                        .replyMarkup(keyboardService.getStartKeyboard())
+                        .build()
+        );
     }
 }
