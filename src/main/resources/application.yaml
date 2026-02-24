@@ -6,9 +6,9 @@ spring:
     hibernate:
       ddl-auto: validate
   datasource:
-    url: ${POSTGRES_JDBC_URL:jdbc:postgresql://localhost:5432/telegram_bot}
-    username: ${POSTGRES_USERNAME:task_tracker_app}
-    password: ${POSTGRES_PASSWORD:abrakadabra}
+    url: ${POSTGRES_JDBC_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -17,4 +17,4 @@ spring:
     enabled: true
 bot:
   name: toDo_taskTracker_bot
-  token: 8562525731:AAETff0eFD46qa_qIN0PkqMAj3bJR2Kojbw
+  token: ${BOT_TOKEN}
