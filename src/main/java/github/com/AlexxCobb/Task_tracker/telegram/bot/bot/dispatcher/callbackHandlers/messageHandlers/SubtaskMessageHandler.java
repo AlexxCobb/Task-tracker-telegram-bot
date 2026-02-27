@@ -22,7 +22,7 @@ public class SubtaskMessageHandler implements UpdateHandler {
     private final KeyboardService keyboardService;
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isTextMessage() && (
                 context.dialogState() == DialogState.AWAITING_SUBTASK
                         || context.dialogState() == DialogState.AWAITING_SHOPPING_ITEM
@@ -37,8 +37,7 @@ public class SubtaskMessageHandler implements UpdateHandler {
 
         taskService.createSubtaskWithEpic(taskId, context.getText());
 
-        var currentState = dialogService.getStateOrDefault(chatId);
-        var isShoppingList = currentState.equals(DialogState.AWAITING_SHOPPING_ITEM);
+        var isShoppingList = context.dialogState().equals(DialogState.AWAITING_SHOPPING_ITEM);
         var responseText = isShoppingList ?
                 "✅ Элемент списка добавлен!\n\nДобавь ещё или заверши:" :
                 "✅ Подзадача добавлена!\n\nДобавь ещё или заверши:";

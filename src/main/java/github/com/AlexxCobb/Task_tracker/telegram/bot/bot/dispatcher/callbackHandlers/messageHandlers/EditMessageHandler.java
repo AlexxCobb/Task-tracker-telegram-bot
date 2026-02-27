@@ -22,7 +22,7 @@ public class EditMessageHandler implements UpdateHandler {
     private final KeyboardService keyboardService;
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isTextMessage() && context.dialogState().equals(DialogState.EDIT_TASK);
     }
 

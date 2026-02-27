@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMet
 import java.util.List;
 
 public interface UpdateHandler {
-    Boolean canHandle(UpdateContext context);
+    boolean canHandle(UpdateContext context);
 
     List<PartialBotApiMethod<?>> handle(UpdateContext context);
 }

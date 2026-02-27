@@ -17,18 +17,7 @@ public class DialogService {
 
     @Transactional
     public void setDialogState(Long chatId, DialogState state, Long taskId) {
-        var context = contextRepository.findById(chatId)
-                .map(existing -> existing.toBuilder()
-                        .dialogState(state)
-                        .taskId(taskId)
-                        .build())
-                .orElseGet(() -> DialogContext.builder()
-                        .chatId(chatId)
-                        .dialogState(state)
-                        .taskId(taskId)
-                        .build());
-
-        contextRepository.save(context);
+        contextRepository.updateContext(chatId, state.name(), taskId);
     }
 
     public DialogState getStateOrDefault(Long chatId) {

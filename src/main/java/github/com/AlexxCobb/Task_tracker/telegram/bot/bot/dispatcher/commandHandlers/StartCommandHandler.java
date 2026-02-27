@@ -18,7 +18,7 @@ public class StartCommandHandler implements UpdateHandler {
     private final KeyboardService keyboardService;
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isTextMessage() && context.getText().equals("/start");
     }
 
@@ -54,7 +54,6 @@ public class StartCommandHandler implements UpdateHandler {
                 SendMessage.builder()
                         .chatId(chatId)
                         .text(text)
-                        .parseMode("MarkdownV2")
                         .replyMarkup(keyboardService.getStartKeyboard())
                         .build()
         );

@@ -29,7 +29,7 @@ public class CreateFlowCallbackHandler implements UpdateHandler {
             CallbackType.CREATE_ANOTHER_TASK, Pair.of(DialogState.AWAITING_TASK_TITLE, "✍️ Введи название задачи:"));
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isCallback() && FLOW_CONFIG.containsKey(context.dto().getType());
     }
 

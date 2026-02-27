@@ -1,5 +1,6 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.screenRenders;
 
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.TaskStatusFilter;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.UpdateContext;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.TaskService;
@@ -21,7 +22,7 @@ public class TaskScreenRenderer {
                 .getCallbackQuery()
                 .getMessage()
                 .getMessageId();
-        var filter = context.dto().getSource().toFilter();
+        var filter = context.dto().getSource().toFilter().orElse(TaskStatusFilter.ALL);
         var tasks = taskService.getTasks(chatId, filter);
 
         return EditMessageText.builder()
