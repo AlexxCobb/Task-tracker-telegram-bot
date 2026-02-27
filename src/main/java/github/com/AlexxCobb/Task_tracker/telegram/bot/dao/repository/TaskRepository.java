@@ -13,6 +13,9 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
+    @EntityGraph(attributePaths = "subtasks")
+    @Query("SELECT t FROM Task t WHERE t.id = :taskId")
+    Optional<Task> findByIdWithSubtasks(Long taskId);
 
     @EntityGraph(attributePaths = "subtasks")
     @Query("select t FROM Task t WHERE t.user.chatId = :chatId AND t.id = :taskId ")
@@ -44,6 +47,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Task t WHERE t.user.chatId = :chatId AND t.status = :status")
-    int deleteByUserChatIdAndStatus(Long chatId, Status status);
+    void deleteByUserChatIdAndStatus(Long chatId, Status status);
 
 }

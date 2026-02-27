@@ -22,7 +22,7 @@ public class SelectSubtaskCallbackHandler implements UpdateHandler {
     private final TaskMessageFormatter formatter;
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isCallback() && context.dto().getType() == CallbackType.SELECT_SUBTASK;
     }
 

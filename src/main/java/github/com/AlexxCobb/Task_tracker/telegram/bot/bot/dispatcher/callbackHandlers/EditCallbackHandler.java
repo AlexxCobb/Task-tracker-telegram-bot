@@ -19,7 +19,7 @@ public class EditCallbackHandler implements UpdateHandler {
     private final DialogService dialogService;
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isCallback() && context.dto().getType().equals(CallbackType.TASK_EDIT);
     }
 

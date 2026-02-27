@@ -23,7 +23,7 @@ public class ShowTasksAndListCallbackHandler implements UpdateHandler {
     private final KeyboardService keyboardService;
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         if (!context.isCallback()) return false;
 
         var type = context.dto().getType();
@@ -43,10 +43,7 @@ public class ShowTasksAndListCallbackHandler implements UpdateHandler {
                 .getMessage()
                 .getMessageId();
 
-        var filter = callbackType.toFilter();
-        if (filter == null) {
-            filter = TaskStatusFilter.ALL;
-        }
+        var filter = callbackType.toFilter().orElse(TaskStatusFilter.ALL);
 
         var taskDetailsList = taskService.getTasks(chatId, filter);
         var text = formatter.formatTask(taskDetailsList);
@@ -57,7 +54,6 @@ public class ShowTasksAndListCallbackHandler implements UpdateHandler {
                         .chatId(chatId)
                         .messageId(messageId)
                         .text(text)
-                        .parseMode("Markdown")
                         .replyMarkup(keyboard)
                         .build()
         );

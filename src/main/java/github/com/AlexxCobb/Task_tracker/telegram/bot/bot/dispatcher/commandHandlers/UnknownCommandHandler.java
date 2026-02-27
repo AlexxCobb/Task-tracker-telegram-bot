@@ -17,7 +17,7 @@ public class UnknownCommandHandler implements UpdateHandler {
     private final KeyboardService keyboardService;
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isTextMessage();
     }
 

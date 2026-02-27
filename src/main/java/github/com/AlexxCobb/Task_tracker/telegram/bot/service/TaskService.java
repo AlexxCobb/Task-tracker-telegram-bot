@@ -148,10 +148,7 @@ public class TaskService {
 
     @Transactional
     public void removeCompletedTasks(Long chatId) {
-        int deleted =  taskRepository.deleteByUserChatIdAndStatus(chatId, Status.DONE);
-        if (deleted == 0) {
-            throw new TaskNotFoundException();
-        }
+        taskRepository.deleteByUserChatIdAndStatus(chatId, Status.DONE);
     }
 
     @Transactional
@@ -167,7 +164,7 @@ public class TaskService {
     }
 
     private Task getTaskById(Long taskId) {
-        return taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        return taskRepository.findByIdWithSubtasks(taskId).orElseThrow(TaskNotFoundException::new);
     }
 
     private void checkTaskStatusWithSubtasks(Long taskId) {

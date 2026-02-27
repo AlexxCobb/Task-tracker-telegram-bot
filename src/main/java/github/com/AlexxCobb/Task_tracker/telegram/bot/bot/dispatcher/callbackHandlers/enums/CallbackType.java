@@ -1,5 +1,7 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums;
 
+import java.util.Optional;
+
 public enum CallbackType {
     CREATE_TASK,
     CREATE_TASK_WITH_SUBTASKS,
@@ -25,12 +27,12 @@ public enum CallbackType {
     DELETE_COMPLETED_TASKS,
     BACK_TO;
 
-    public TaskStatusFilter toFilter() {
+    public Optional<TaskStatusFilter> toFilter() {
         return switch (this) {
-            case SHOW_ACTIVE_TASKS -> TaskStatusFilter.ACTIVE;
-            case SHOW_COMPLETED_TASKS -> TaskStatusFilter.COMPLETED;
-            case SHOW_ALL_TASKS, SHOW_SHOPPING_LIST -> TaskStatusFilter.ALL;
-            default -> throw new IllegalStateException("Unexpected callback type: " + this);
+            case SHOW_ACTIVE_TASKS -> Optional.of(TaskStatusFilter.ACTIVE);
+            case SHOW_COMPLETED_TASKS -> Optional.of(TaskStatusFilter.COMPLETED);
+            case SHOW_ALL_TASKS, SHOW_SHOPPING_LIST -> Optional.of(TaskStatusFilter.ALL);
+            default -> Optional.empty();
         };
     }
 }

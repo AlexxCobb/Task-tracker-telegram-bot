@@ -12,7 +12,7 @@ import java.util.List;
 public class UnknownCallbackHandler implements UpdateHandler {
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isCallback();
     }
 

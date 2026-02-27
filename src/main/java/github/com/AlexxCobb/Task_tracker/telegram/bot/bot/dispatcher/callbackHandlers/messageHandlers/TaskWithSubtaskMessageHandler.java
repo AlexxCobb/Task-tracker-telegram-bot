@@ -20,7 +20,7 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
     private final TaskService taskService;
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isTextMessage() && (context.dialogState().equals(DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE)
                 || context.dialogState().equals(DialogState.AWAITING_TASK_WITH_SHOPPING_ITEMS_TITLE));
     }

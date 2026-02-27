@@ -21,7 +21,7 @@ public class DeleteCallbackHandler implements UpdateHandler {
     private final NavigationService navigationService;
 
     @Override
-    public Boolean canHandle(UpdateContext context) {
+    public boolean canHandle(UpdateContext context) {
         return context.isCallback() && (
                 context.dto().getType().equals(CallbackType.TASK_DELETE) ||
                         context.dto().getType().equals(CallbackType.SUBTASK_DELETE));
