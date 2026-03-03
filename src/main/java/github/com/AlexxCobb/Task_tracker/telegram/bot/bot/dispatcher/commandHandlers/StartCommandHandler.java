@@ -54,6 +54,7 @@ public class StartCommandHandler implements UpdateHandler {
                 SendMessage.builder()
                         .chatId(chatId)
                         .text(text)
+                        .parseMode("MarkdownV2")
                         .replyMarkup(keyboardService.getStartKeyboard())
                         .build()
         );
