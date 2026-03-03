@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1772551655-add-reminder-table
+      author: a.zinovev
+      changes:
+        - sqlFile:
+            path: classpath:db/changelog/sql/1772551655-add-reminder-table.sql
