@@ -27,6 +27,8 @@ public enum KeyboardButton {
     SUBTASK_COMPLETE("✅ Выполнено", CallbackType.SUBTASK_COMPLETE),
     SUBTASK_DELETE("🗑️ Удалить", CallbackType.SUBTASK_DELETE),
 
+    CANCEL_REMIND("\uD83D\uDDD1 Удалить напоминание", CallbackType.CANCEL_REMIND),
+
     MAIN_MENU("В главное меню", CallbackType.MAIN_MENU),
     LIST_DONE("Список составлен", CallbackType.LIST_DONE),
     DELETE_COMPLETED_TASKS("Удалить выполненные задачи", CallbackType.DELETE_COMPLETED_TASKS),

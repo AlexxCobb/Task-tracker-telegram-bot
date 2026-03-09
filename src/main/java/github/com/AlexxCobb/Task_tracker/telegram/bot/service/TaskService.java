@@ -123,6 +123,10 @@ public class TaskService {
         return taskMapper.toTaskDetails(task);
     }
 
+    public Task getTaskEntityForUser(Long chatId, Long taskId) {
+        return taskRepository.findUserChatIdAndById(chatId, taskId).orElseThrow(TaskNotFoundException::new);
+    }
+
     public SubtaskDetails getSubtaskForUser(Long chatId, Long subtaskId) {
         var subtask =
                 subtaskRepository.findByIdAndUserChatId(subtaskId, chatId).orElseThrow(SubtaskNotFoundException::new);

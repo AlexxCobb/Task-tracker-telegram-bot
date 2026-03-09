@@ -17,6 +17,7 @@ public class ReminderMapper {
         }
 
         return ReminderDetails.builder()
+                .id(reminder.getId())
                 .chatId(reminder.getChatId())
                 .status(reminder.getStatus())
                 .remindAt(reminder.getRemindAt())

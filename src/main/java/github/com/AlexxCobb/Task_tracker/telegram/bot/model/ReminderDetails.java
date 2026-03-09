@@ -5,8 +5,9 @@ import lombok.Builder;
 
 import java.time.OffsetDateTime;
 
-@Builder
+@Builder(toBuilder = true)
 public record ReminderDetails(
+        Long id,
         Long chatId,
         TaskDetails taskDetails,
         OffsetDateTime remindAt,
