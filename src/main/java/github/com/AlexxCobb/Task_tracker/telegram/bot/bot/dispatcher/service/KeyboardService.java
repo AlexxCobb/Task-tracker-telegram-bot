@@ -6,6 +6,7 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHan
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.enums.KeyboardButton;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.model.ReminderDetails;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.SubtaskDetails;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.TaskDetails;
 import lombok.RequiredArgsConstructor;
@@ -109,6 +110,25 @@ public class KeyboardService {
                 row(KeyboardButton.SUBTASK_COMPLETE.toButton(subtaskId, taskId, source),
                     KeyboardButton.SUBTASK_DELETE.toButton(subtaskId, taskId, source)),
                 row(KeyboardButton.BACK_TO.backButton(CallbackType.OPEN_SUBTASKS, taskId, null, source)));
+    }
+
+    public InlineKeyboardMarkup getReminderKeyboard(ReminderDetails details) {
+        List<InlineKeyboardRow> rows = new ArrayList<>();
+        var taskId = details.taskDetails().id();
+
+        rows.add(row(
+                KeyboardButton.TASK_COMPLETE.toButton(taskId, null, null),
+                KeyboardButton.TASK_DELETE.toButton(taskId, null, null)
+        ));
+
+        if (details.taskDetails().subtasks() != null && !details.taskDetails().subtasks().isEmpty()) {
+            rows.add(row(
+                    KeyboardButton.OPEN_SUBTASKS.toButton(taskId, null, null)
+            ));
+        }
+        rows.add(row(KeyboardButton.CANCEL_REMIND.toButton(details.id())));
+
+        return keyboard(rows.toArray(new InlineKeyboardRow[0]));
     }
 
     public InlineKeyboardMarkup buildBackKeyboard(CallbackType source, Long parentId) {
