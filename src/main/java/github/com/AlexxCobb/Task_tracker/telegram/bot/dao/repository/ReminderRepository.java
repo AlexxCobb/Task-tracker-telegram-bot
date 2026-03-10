@@ -21,7 +21,7 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
     @Query("update Reminder r set r.status = :status, r.sentAt = :sentAt where r.id in :ids")
     void updateStatusAtByIds(ReminderStatus status, OffsetDateTime sentAt, List<Long> ids);
 
-    @Query(value = "select id from reminder where status = 'SCHEDULED' and remind_at <= now() "
+    @Query(value = "select reminder_id from reminder where status = 'SCHEDULED' and remind_at <= now() "
             + "for update skip locked limit :batchSize", nativeQuery = true)
     List<Long> selectForUpdate(int batchSize);
 }
