@@ -12,8 +12,7 @@ public class ReminderScheduler {
     private final ReminderUseCaseService reminderUseCaseService;
 
     @Scheduled(fixedDelay = 60000)
-    public void processReminders(){
-        reminderUseCaseService.sendReminderUseCase();;
+    public void processReminders() {
+        reminderUseCaseService.sendReminderUseCase();
     }
-
 }

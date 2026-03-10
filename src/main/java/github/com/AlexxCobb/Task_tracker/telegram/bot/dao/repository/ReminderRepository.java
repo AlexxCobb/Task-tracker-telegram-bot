@@ -23,5 +23,5 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
 
     @Query(value = "select id from reminder where status = 'SCHEDULED' and remind_at <= now() "
             + "for update skip locked limit :batchSize", nativeQuery = true)
-    List<Long> selectForUpdate(Integer batchSize);
+    List<Long> selectForUpdate(int batchSize);
 }

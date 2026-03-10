@@ -55,6 +55,6 @@ public class ReminderService {
 
     @Transactional
     public void cancelRemind(Long remindId) {
-
+        reminderRepository.deleteById(remindId);
     }
 }

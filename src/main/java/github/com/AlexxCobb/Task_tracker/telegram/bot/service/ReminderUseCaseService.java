@@ -1,20 +1,17 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class ReminderUseCaseService {
 
     private final ReminderService reminderService;
     private final ReminderNotificationService notificationService;
     private final TaskService taskService;
-
 
     public void createReminderUseCase(Long chatId, Long taskId, OffsetDateTime dateTime) {
         var task = taskService.getTaskEntityForUser(chatId, taskId);
@@ -35,5 +32,4 @@ public class ReminderUseCaseService {
     public void cancelReminderUseCase(Long remindId) {
         reminderService.cancelRemind(remindId);
     }
-
 }
