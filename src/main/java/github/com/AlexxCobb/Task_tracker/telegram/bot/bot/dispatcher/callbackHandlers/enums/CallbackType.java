@@ -25,7 +25,13 @@ public enum CallbackType {
     MAIN_MENU,
     LIST_DONE,
     DELETE_COMPLETED_TASKS,
-    BACK_TO;
+    BACK_TO,
+    ADD_REMIND,
+    CANCEL_REMIND,
+    CALENDAR_NAVIGATE,
+    CALENDAR_SELECT_DAY,
+    CALENDAR_SELECT_TIME,
+    CALENDAR_IGNORE;
 
     public Optional<TaskStatusFilter> toFilter() {
         return switch (this) {

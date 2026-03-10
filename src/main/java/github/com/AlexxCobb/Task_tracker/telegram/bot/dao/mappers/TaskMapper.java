@@ -4,13 +4,17 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Subtask;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.SubtaskDetails;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.TaskDetails;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class TaskMapper {
+
+    private final SubtaskMapper subtaskMapper;
 
     public TaskDetails toTaskDetails(Task task) {
         if (task == null) {
@@ -40,15 +44,7 @@ public class TaskMapper {
             return Collections.emptyList();
         }
         return subtasks.stream()
-                .map(this::toSubtaskDetails)
+                .map(subtaskMapper::toSubtaskDetails)
                 .toList();
-    }
-
-    private SubtaskDetails toSubtaskDetails(Subtask subtask) {
-        return SubtaskDetails.builder()
-                .id(subtask.getId())
-                .title(subtask.getTitle())
-                .status(subtask.getStatus())
-                .build();
     }
 }

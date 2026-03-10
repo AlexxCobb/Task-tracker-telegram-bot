@@ -13,16 +13,18 @@ public final class CallbackDataMapper {
                            dto.getType().name(),
                            dto.getEntityId() != null ? dto.getEntityId().toString() : "",
                            dto.getParentId() != null ? dto.getParentId().toString() : "",
-                           dto.getSource() != null ? dto.getSource().name() : "");
+                           dto.getSource() != null ? dto.getSource().name() : "",
+                           dto.getExtra() != null ? dto.getExtra() : "");
     }
 
     public static CallbackDto toDtoFromData(String data) {
-        var parts = data.split(":");
+        var parts = data.split(":", 5);
         return CallbackDto.builder()
                 .type(CallbackType.valueOf(parts[0]))
                 .entityId(parts.length > 1 && !parts[1].isBlank() ? Long.valueOf(parts[1]) : null)
                 .parentId(parts.length > 2 && !parts[2].isBlank() ? Long.valueOf(parts[2]) : null)
                 .source(parts.length > 3 && !parts[3].isBlank() ? CallbackType.valueOf(parts[3]) : null)
+                .extra(parts.length > 4 && !parts[4].isBlank() ? parts[4] : null)
                 .build();
     }
 }

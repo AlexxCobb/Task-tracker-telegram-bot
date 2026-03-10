@@ -32,7 +32,7 @@ public class UpdateDispatcher {
             var dialogState = dialogService.getStateOrDefault(chatId);
             var context = new UpdateContext(update, chatId, dto, dialogState, isNewUser);
 
-             return handlers.stream()
+            return handlers.stream()
                     .filter(h -> h.canHandle(context))
                     .findFirst()
                     .map(h -> h.handle(context))

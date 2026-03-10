@@ -16,7 +16,7 @@ public class FallbackScreenRenderer {
         return EditMessageText.builder()
                 .chatId(context.chatId())
                 .messageId(context.update().getCallbackQuery().getMessage().getMessageId())
-                .text("Выбери, что хочешь сделать:")
+                .text("Готово!\n\nВыбери, что хочешь сделать:")
                 .replyMarkup(keyboardService.getStartKeyboard())
                 .build();
     }

@@ -1,8 +1,8 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.enums;
 
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.mapper.CallbackDataMapper;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 public enum KeyboardButton {
@@ -26,6 +26,9 @@ public enum KeyboardButton {
 
     SUBTASK_COMPLETE("✅ Выполнено", CallbackType.SUBTASK_COMPLETE),
     SUBTASK_DELETE("🗑️ Удалить", CallbackType.SUBTASK_DELETE),
+
+    ADD_REMIND("⏰ Добавить напоминание", CallbackType.ADD_REMIND),
+    CANCEL_REMIND("\uD83D\uDDD1 Удалить напоминание", CallbackType.CANCEL_REMIND),
 
     MAIN_MENU("В главное меню", CallbackType.MAIN_MENU),
     LIST_DONE("Список составлен", CallbackType.LIST_DONE),
