@@ -9,7 +9,6 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.ReminderDetails;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.SubtaskDetails;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.TaskDetails;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -20,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class KeyboardService {
 
     public InlineKeyboardMarkup getStartKeyboard() {
@@ -34,7 +32,8 @@ public class KeyboardService {
     public InlineKeyboardMarkup getEditKeyboard(Long taskId) {
         return keyboard(
                 row(KeyboardButton.TASK_EDIT.toButton(taskId), KeyboardButton.CREATE_ANOTHER_TASK.toButton(taskId)),
-                row(KeyboardButton.TASK_DELETE.toButton(taskId), KeyboardButton.MAIN_MENU.toButton()));
+                row(KeyboardButton.TASK_DELETE.toButton(taskId), KeyboardButton.ADD_REMIND.toButton(taskId)),
+                row(KeyboardButton.MAIN_MENU.toButton()));
     }
 
     public InlineKeyboardMarkup getListDoneKeyboard() {
@@ -45,11 +44,13 @@ public class KeyboardService {
 
         List<InlineKeyboardRow> rows = new ArrayList<>();
 
-        rows.add(row(
-                KeyboardButton.TASK_EDIT.toButton(taskDetails.id(), null, source),
-                KeyboardButton.TASK_COMPLETE.toButton(taskDetails.id(), null, source),
-                KeyboardButton.TASK_DELETE.toButton(taskDetails.id(), null, source)
-        ));
+        rows.add(row(KeyboardButton.TASK_COMPLETE.toButton(taskDetails.id(), null, source),
+                     KeyboardButton.TASK_DELETE.toButton(taskDetails.id(), null, source)));
+
+        if (taskDetails.status().equals(Status.NEW)) {
+            rows.add(row(KeyboardButton.TASK_EDIT.toButton(taskDetails.id(), null, source),
+                         KeyboardButton.ADD_REMIND.toButton(taskDetails.id(), null, source)));
+        }
 
         if (taskDetails.subtasks() != null && !taskDetails.subtasks().isEmpty()) {
             rows.add(row(

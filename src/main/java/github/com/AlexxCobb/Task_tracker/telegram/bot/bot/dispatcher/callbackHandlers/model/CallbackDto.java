@@ -11,4 +11,5 @@ public class CallbackDto {
     private Long entityId;
     private Long parentId;
     private CallbackType source;
+    private String extra;
 }
