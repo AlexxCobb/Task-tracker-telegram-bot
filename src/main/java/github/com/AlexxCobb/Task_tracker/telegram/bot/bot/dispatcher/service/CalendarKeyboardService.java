@@ -27,7 +27,7 @@ public class CalendarKeyboardService {
         rows.add(buildNavigationRow(taskId, yearMonth, source));
         rows.add(buildWeekDaysRow());
         rows.addAll(buildDaysRows(taskId, yearMonth, source));
-        rows.add(buildCancelRow(source));
+        rows.add(buildCancelRow(taskId, source));
 
         return InlineKeyboardMarkup.builder().keyboard(rows).build();
     }
@@ -191,13 +191,26 @@ public class CalendarKeyboardService {
         return new InlineKeyboardRow(List.of(button("⬅ Назад к дате", dto)));
     }
 
-    private InlineKeyboardRow buildCancelRow(CallbackType source) {
-        var type = source != null ? source : CallbackType.MAIN_MENU;
-        var dto = CallbackDto.builder()
-                .type(type)
-                .source(type)
-                .build();
-
+    private InlineKeyboardRow buildCancelRow(Long taskId, CallbackType source) {
+        var dto = resolveCancelDto(taskId, source);
         return new InlineKeyboardRow(List.of(button("❌ Отмена", dto)));
+    }
+
+    private CallbackDto resolveCancelDto(Long taskId, CallbackType source) {
+        var type = source != null ? source : CallbackType.MAIN_MENU;
+        return switch (type) {
+            case SELECT_REMIND -> CallbackDto.builder()
+                    .type(CallbackType.SHOW_REMINDERS)
+                    .source(type)
+                    .build();
+            case MAIN_MENU -> CallbackDto.builder()
+                    .type(CallbackType.MAIN_MENU)
+                    .build();
+            default -> CallbackDto.builder()
+                    .type(CallbackType.SELECT_TASK)
+                    .entityId(taskId)
+                    .source(type)
+                    .build();
+        };
     }
 }

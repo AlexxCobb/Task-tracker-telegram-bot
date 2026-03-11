@@ -3,6 +3,7 @@ package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.enums.CallbackType;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.UpdateContext;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.screenRenders.FallbackScreenRenderer;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.screenRenders.ShoppingListScreenRenderer;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.screenRenders.SubtaskScreenRenderer;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.screenRenders.TaskScreenRenderer;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ public class NavigationService {
     private final TaskScreenRenderer taskScreenRenderer;
     private final SubtaskScreenRenderer subtaskScreenRenderer;
     private final FallbackScreenRenderer fallbackScreenRenderer;
+    private final ShoppingListScreenRenderer shoppingListScreenRenderer;
 
     public EditMessageText returnAfterMutation(UpdateContext context) {
         var actionType = context.dto().getType();
@@ -25,12 +27,13 @@ public class NavigationService {
         }
 
         if (target == null) {
-           return fallbackScreenRenderer.fallback(context);
+            return fallbackScreenRenderer.fallback(context);
         }
 
         return switch (target) {
             case SHOW_ALL_TASKS, SHOW_ACTIVE_TASKS, SHOW_COMPLETED_TASKS -> taskScreenRenderer.renderList(context);
             case OPEN_SUBTASKS -> subtaskScreenRenderer.renderList(context);
+            case SHOW_SHOPPING_LIST -> shoppingListScreenRenderer.renderList(context);
             default -> throw new IllegalStateException("Unexpected value: " + target);
         };
     }

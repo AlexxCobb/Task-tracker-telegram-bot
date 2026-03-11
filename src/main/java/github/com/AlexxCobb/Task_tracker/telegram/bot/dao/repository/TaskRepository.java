@@ -26,16 +26,14 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     int updateTitle(Long id, Long chatId, String title);
 
     @EntityGraph(attributePaths = "subtasks")
-    @Query("select t from Task t where t.user.chatId = :chatId and t.status = :status and t.isShoppingList = false")
-    List<Task> findUserTasksWithStatus(Long chatId, Status status);
-
-    @EntityGraph(attributePaths = "subtasks")
-    @Query("select t from Task t where t.user.chatId = :chatId and t.isShoppingList = false")
-    List<Task> findAllUserTasks(Long chatId);
-
-    @EntityGraph(attributePaths = "subtasks")
-    @Query("select t from Task t where t.user.chatId = :chatId and t.isShoppingList = true")
+    @Query("select t from Task t where t.user.chatId = :chatId and t.type = SHOPPING_LIST")
     List<Task> findUserShoppingList(Long chatId);
+
+    @EntityGraph(attributePaths = "subtasks")
+    @Query("select t from Task t where t.user.chatId = :chatId " +
+            "and t.type != SHOPPING_LIST " +
+            "and (:status is null or t.status = :status)")
+    List<Task> findUserTasks(Long chatId, Status status);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Task t set t.status = DONE, t.updatedAt = CURRENT_TIMESTAMP where t.id = :id and t.user.chatId = :chatId")
@@ -48,5 +46,4 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Task t WHERE t.user.chatId = :chatId AND t.status = :status")
     void deleteByUserChatIdAndStatus(Long chatId, Status status);
-
 }

@@ -13,7 +13,7 @@ public enum KeyboardButton {
     SHOW_ALL_TASKS("\uD83D\uDCD1 Показать все задачи", CallbackType.SHOW_ALL_TASKS),
     SHOW_ACTIVE_TASKS("📋 Показать активные задачи", CallbackType.SHOW_ACTIVE_TASKS),
     SHOW_COMPLETED_TASKS("\uD83D\uDCE6 Показать завершённые задачи", CallbackType.SHOW_COMPLETED_TASKS),
-    SHOW_SHOPPING_LIST("📋 Показать списки покупок", CallbackType.SHOW_SHOPPING_LIST),
+    SHOW_SHOPPING_LIST("🛒 Показать списки покупок", CallbackType.SHOW_SHOPPING_LIST),
 
     CREATE_ANOTHER_TASK("➕ Создать еще задачу", CallbackType.CREATE_ANOTHER_TASK),
     TASK_EDIT("✏️ Редактировать", CallbackType.TASK_EDIT),

@@ -26,7 +26,9 @@ public class KeyboardService {
     public InlineKeyboardMarkup getStartKeyboard() {
         return keyboard(row(KeyboardButton.CREATE_TASK.toButton()),
                         row(KeyboardButton.CREATE_TASK_WITH_SUBTASKS.toButton()),
+                        row(KeyboardButton.CREATE_SHOPPING_LIST.toButton()),
                         row(KeyboardButton.SHOW_ALL_TASKS.toButton()),
+                        row(KeyboardButton.SHOW_SHOPPING_LIST.toButton()),
                         row(KeyboardButton.SHOW_ACTIVE_TASKS.toButton()),
                         row(KeyboardButton.SHOW_COMPLETED_TASKS.toButton()));
     }
@@ -85,6 +87,19 @@ public class KeyboardService {
 
         rows.add(row(KeyboardButton.MAIN_MENU.toButton()));
 
+        return keyboard(rows.toArray(new InlineKeyboardRow[0]));
+    }
+
+    public InlineKeyboardMarkup getShoppingListSelectionKeyboard(List<TaskDetails> lists) {
+        List<InlineKeyboardRow> rows = new ArrayList<>();
+        var source = CallbackType.SHOW_SHOPPING_LIST;
+
+        for (TaskDetails list : lists) {
+            var title = list.status() == Status.DONE ? "✅ " + list.title() : list.title();
+            rows.add(row(KeyboardButton.SELECT_TASK.toButton(list.id(), null, source, title)));
+        }
+
+        rows.add(row(KeyboardButton.MAIN_MENU.toButton()));
         return keyboard(rows.toArray(new InlineKeyboardRow[0]));
     }
 

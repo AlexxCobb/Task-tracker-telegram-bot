@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1773230076-update-task-table
+      author: a.zinovev
+      changes:
+        - sqlFile:
+            path: classpath:db/changelog/sql/1773230076-update-task-table.sql
