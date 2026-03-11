@@ -5,6 +5,8 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.ReminderStatus;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.mappers.ReminderMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.repository.ReminderRepository;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.ForbiddenException;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.ReminderAlreadyExistsException;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.ReminderDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,11 @@ public class ReminderService {
 
     @Transactional
     public void createTaskRemind(Long chatId, Task task, OffsetDateTime dateTime) {
+        var alreadyExists = reminderRepository.existsByTaskIdAndRemindAtAndStatus(task.getId(), dateTime, ReminderStatus.SCHEDULED);
+        if (alreadyExists) {
+            throw new ReminderAlreadyExistsException();
+        }
+
         var taskReminder = Reminder.builder()
                 .chatId(chatId)
                 .remindAt(dateTime)
@@ -56,5 +63,18 @@ public class ReminderService {
     @Transactional
     public void cancelRemind(Long remindId) {
         reminderRepository.deleteById(remindId);
+    }
+
+    public List<ReminderDetails> findReminderDetailsList(Long chatId) {
+        return reminderRepository.findRemindersWithTasks(chatId)
+                .stream()
+                .map(reminderMapper::toReminderDetails)
+                .toList();
+    }
+
+    public ReminderDetails findReminderDetail(Long reminderId, Long chatId) {
+        var reminder = reminderRepository.findUserReminderWithTasks(reminderId, chatId).orElseThrow(
+                ForbiddenException::new);
+        return reminderMapper.toReminderDetails(reminder);
     }
 }

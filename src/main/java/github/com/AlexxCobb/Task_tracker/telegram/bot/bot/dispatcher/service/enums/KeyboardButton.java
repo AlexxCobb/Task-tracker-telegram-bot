@@ -29,6 +29,7 @@ public enum KeyboardButton {
 
     ADD_REMIND("⏰ Добавить напоминание", CallbackType.ADD_REMIND),
     CANCEL_REMIND("\uD83D\uDDD1 Удалить напоминание", CallbackType.CANCEL_REMIND),
+    SELECT_REMIND("Выбрать задачу с уведомлением", CallbackType.SELECT_REMIND),
 
     MAIN_MENU("В главное меню", CallbackType.MAIN_MENU),
     LIST_DONE("Список составлен", CallbackType.LIST_DONE),

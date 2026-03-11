@@ -1,7 +1,7 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.exceptionHandlers;
 
-import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.KeyboardService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.mapper.CallbackDataMapper;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.ReminderReturnService;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.exception.BotException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @RequiredArgsConstructor
 public class ExceptionHandler {
 
-    private final KeyboardService keyboardService;
+    private final ReminderReturnService reminderReturnService;
 
     public PartialBotApiMethod<?> handleException(Update update, Exception e) {
         if (update.hasCallbackQuery()) {
@@ -29,29 +29,21 @@ public class ExceptionHandler {
     }
 
     private EditMessageText handleCallbackException(Update update, Exception e) {
-
         var callback = update.getCallbackQuery();
         var chatId = callback.getMessage().getChatId();
         var messageId = callback.getMessage().getMessageId();
-
         var errorText = resolveMessage(e);
         var dto = CallbackDataMapper.toDtoFromData(callback.getData());
-
-        var keyboard = keyboardService.buildBackKeyboard(
-                dto.getSource(),
-                dto.getParentId()
-        );
 
         return EditMessageText.builder()
                 .chatId(chatId)
                 .messageId(messageId)
                 .text("⚠️ " + errorText)
-                .replyMarkup(keyboard)
+                .replyMarkup(reminderReturnService.resolveErrorKeyboard(dto))
                 .build();
     }
 
     private SendMessage handleMessageException(Update update, Exception e) {
-
         var chatId = update.getMessage().getChatId();
         var errorText = resolveMessage(e);
 
