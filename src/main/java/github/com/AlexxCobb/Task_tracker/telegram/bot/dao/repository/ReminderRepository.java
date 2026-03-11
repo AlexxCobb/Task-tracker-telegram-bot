@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReminderRepository extends JpaRepository<Reminder, Long> {
@@ -24,4 +25,15 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
     @Query(value = "select reminder_id from reminder where status = 'SCHEDULED' and remind_at <= now() "
             + "for update skip locked limit :batchSize", nativeQuery = true)
     List<Long> selectForUpdate(int batchSize);
+
+    @Query(value = "select r from Reminder r join fetch r.task t left join fetch t.subtasks " +
+            "where r.status = SCHEDULED and r.task.status = NEW and r.chatId = :chatId " +
+            "order by r.remindAt asc")
+    List<Reminder> findRemindersWithTasks(Long chatId);
+
+    @Query(value = "select r from Reminder r join fetch r.task t left join fetch t.subtasks " +
+            "where r.id = :reminderId and r.status = SCHEDULED and r.task.status = NEW and r.chatId = :chatId")
+    Optional<Reminder> findUserReminderWithTasks(Long reminderId, Long chatId);
+
+    boolean existsByTaskIdAndRemindAtAndStatus(Long taskId, OffsetDateTime remindAt, ReminderStatus status);
 }

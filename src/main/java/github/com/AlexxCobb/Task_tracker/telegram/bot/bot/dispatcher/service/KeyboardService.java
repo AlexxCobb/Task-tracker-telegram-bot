@@ -5,6 +5,7 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHan
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.mapper.CallbackDataMapper;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.callbackHandlers.model.CallbackDto;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.enums.KeyboardButton;
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.util.DateTimeConstants;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.Status;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.ReminderDetails;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.model.SubtaskDetails;
@@ -14,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +34,8 @@ public class KeyboardService {
     public InlineKeyboardMarkup getEditKeyboard(Long taskId) {
         return keyboard(
                 row(KeyboardButton.TASK_EDIT.toButton(taskId), KeyboardButton.CREATE_ANOTHER_TASK.toButton(taskId)),
-                row(KeyboardButton.TASK_DELETE.toButton(taskId), KeyboardButton.ADD_REMIND.toButton(taskId)),
+                row(KeyboardButton.TASK_DELETE.toButton(taskId),
+                    KeyboardButton.ADD_REMIND.toButton(taskId, null, CallbackType.MAIN_MENU)),
                 row(KeyboardButton.MAIN_MENU.toButton()));
     }
 
@@ -127,7 +130,37 @@ public class KeyboardService {
                     KeyboardButton.OPEN_SUBTASKS.toButton(taskId, null, null)
             ));
         }
-        rows.add(row(KeyboardButton.CANCEL_REMIND.toButton(details.id())));
+        rows.add(row(KeyboardButton.ADD_REMIND.toButton(taskId)));
+        rows.add(row(KeyboardButton.MAIN_MENU.toButton()));
+
+        return keyboard(rows.toArray(new InlineKeyboardRow[0]));
+    }
+
+    public InlineKeyboardMarkup getReminderEditKeyboard(ReminderDetails details, CallbackType source) {
+        List<InlineKeyboardRow> rows = new ArrayList<>();
+        var taskId = details.taskDetails().id();
+
+        rows.add(row(KeyboardButton.ADD_REMIND.toButton(taskId, null, source)));
+        rows.add(row(KeyboardButton.CANCEL_REMIND.toButton(details.id(), null, source)));
+        rows.add(row(KeyboardButton.BACK_TO.backButton(CallbackType.SHOW_REMINDERS, null, null, source)));
+
+        return keyboard(rows.toArray(new InlineKeyboardRow[0]));
+    }
+
+    public InlineKeyboardMarkup getReminderSelectionKeyboard(List<ReminderDetails> reminderDetails) {
+        List<InlineKeyboardRow> rows = new ArrayList<>();
+
+        for (ReminderDetails reminderDetail : reminderDetails) {
+            var title = reminderDetail.taskDetails().title();
+            var date = reminderDetail.remindAt()
+                    .atZoneSameInstant(ZoneId.of("Europe/Moscow"))
+                    .format(DateTimeConstants.DATE_TIME_FORMATTER);
+            var textToButton = title + " - " + date;
+
+            rows.add(row(KeyboardButton.SELECT_REMIND.toButton(reminderDetail.id(), null, null, textToButton)));
+        }
+
+        rows.add(row(KeyboardButton.MAIN_MENU.toButton()));
 
         return keyboard(rows.toArray(new InlineKeyboardRow[0]));
     }
