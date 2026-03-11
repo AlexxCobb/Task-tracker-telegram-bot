@@ -30,7 +30,7 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
         var chatId = context.chatId();
 
         if (context.dialogState().equals(DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE)) {
-            var taskId = taskService.createEpicTask(chatId, context.getText(), false);
+            var taskId = taskService.createEpicTask(chatId, context.getText());
             dialogService.setDialogState(chatId, DialogState.AWAITING_SUBTASK, taskId);
 
             return List.of(SendMessage.builder()
@@ -38,7 +38,7 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
                                    .text("📝 Название основной задачи сохранено!\n\nНапиши подзадачу:")
                                    .build());
         } else {
-            var taskId = taskService.createEpicTask(chatId, context.getText(), true);
+            var taskId = taskService.createShoppingList(chatId, context.getText());
             dialogService.setDialogState(chatId, DialogState.AWAITING_SHOPPING_ITEM, taskId);
 
             return List.of(SendMessage.builder()

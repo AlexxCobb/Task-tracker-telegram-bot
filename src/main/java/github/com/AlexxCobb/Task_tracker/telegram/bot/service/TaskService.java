@@ -42,7 +42,6 @@ public class TaskService {
                 .title(title)
                 .type(TypeOfTask.TASK)
                 .status(Status.NEW)
-                .isShoppingList(false)
                 .build();
 
         var savedTask = taskRepository.save(task);
@@ -50,7 +49,7 @@ public class TaskService {
     }
 
     @Transactional
-    public Long createEpicTask(Long chatId, String title, Boolean isShoppingList) {
+    public Long createEpicTask(Long chatId, String title) {
         var user = userService.getUser(chatId);
 
         var task = Task.builder()
@@ -58,7 +57,21 @@ public class TaskService {
                 .title(title)
                 .type(TypeOfTask.EPIC_TASK)
                 .status(Status.NEW)
-                .isShoppingList(isShoppingList)
+                .build();
+
+        var savedTask = taskRepository.save(task);
+        return savedTask.getId();
+    }
+
+    @Transactional
+    public Long createShoppingList(Long chatId, String title) {
+        var user = userService.getUser(chatId);
+
+        var task = Task.builder()
+                .user(user)
+                .title(title)
+                .type(TypeOfTask.SHOPPING_LIST)
+                .status(Status.NEW)
                 .build();
 
         var savedTask = taskRepository.save(task);
@@ -69,7 +82,7 @@ public class TaskService {
     public void createSubtaskWithEpic(Long taskId, String title) {
 
         var existedTask = getTaskById(taskId);
-        if (!existedTask.getType().equals(TypeOfTask.EPIC_TASK)) {
+        if (existedTask.getType().equals(TypeOfTask.TASK)) {
             throw new TaskNotFoundException();
         }
         var subtask = Subtask.builder()
@@ -134,12 +147,12 @@ public class TaskService {
     }
 
     public List<TaskDetails> getTasks(Long chatId, @NonNull TaskStatusFilter filter) {
-        //маппинг фильтра и типа
-        return switch (filter) {
-            case ALL -> taskMapper.toTaskDetailsList(taskRepository.findAllUserTasks(chatId));
-            case ACTIVE -> taskMapper.toTaskDetailsList(taskRepository.findUserTasksWithStatus(chatId, Status.NEW));
-            case COMPLETED -> taskMapper.toTaskDetailsList(taskRepository.findUserTasksWithStatus(chatId, Status.DONE));
-        };
+        var status = filter.toStatus().orElse(null);
+        return taskMapper.toTaskDetailsList(taskRepository.findUserTasks(chatId, status));
+    }
+
+    public List<TaskDetails> getShoppingLists(Long chatId) {
+        return taskMapper.toTaskDetailsList(taskRepository.findUserShoppingList(chatId));
     }
 
     @Transactional

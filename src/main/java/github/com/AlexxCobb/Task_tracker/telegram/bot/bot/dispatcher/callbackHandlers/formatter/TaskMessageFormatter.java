@@ -86,4 +86,35 @@ public class TaskMessageFormatter {
 
         return sb.toString();
     }
+
+    public String formatShoppingList(List<TaskDetails> lists) {
+        if (lists.isEmpty()) {
+            return "📭 У вас пока нет списков покупок";
+        }
+
+        var sb = new StringBuilder("🛒 Списки покупок:\n\n");
+
+        for (int i = 0; i < lists.size(); i++) {
+            var list = lists.get(i);
+
+            sb.append(i + 1)
+                    .append(". ")
+                    .append(list.title())
+                    .append("\n");
+
+            if (list.subtasks() != null && !list.subtasks().isEmpty()) {
+                for (var item : list.subtasks()) {
+                    var checkbox = item.status() == Status.DONE ? "   └ ☑️ " : "   └ ☐ ";
+                    sb.append(checkbox)
+                            .append(item.status() == Status.DONE
+                                            ? "~" + item.title() + "~"
+                                            : item.title())
+                            .append("\n");
+                }
+            }
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
 }

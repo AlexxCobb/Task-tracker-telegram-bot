@@ -63,9 +63,6 @@ public class Task {
     @Builder.Default
     private List<Subtask> subtasks = new ArrayList<>();
 
-    @Column(name = "is_shopping_list")
-    private Boolean isShoppingList;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
