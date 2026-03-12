@@ -11,3 +11,5 @@ databaseChangeLog:
       file: classpath:db/changelog/changeset/1772551655-add-reminder-table.yaml
   - include:
       file: classpath:db/changelog/changeset/1773230076-update-task-table.yaml
+  - include:
+      file: classpath:db/changelog/changeset/1773314835-update-dialog-context-table.yaml

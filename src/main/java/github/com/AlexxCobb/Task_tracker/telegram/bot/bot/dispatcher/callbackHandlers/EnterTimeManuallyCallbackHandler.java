@@ -6,49 +6,40 @@ import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.dispatcher.service.Upd
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.DialogState;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.service.DialogService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 
 import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class CreateFlowCallbackHandler implements UpdateHandler {
+public class EnterTimeManuallyCallbackHandler implements UpdateHandler {
 
     private final DialogService dialogService;
 
-    private final Map<CallbackType, Pair<DialogState, String>> FLOW_CONFIG = Map.of(
-            CallbackType.CREATE_SHOPPING_LIST,
-            Pair.of(DialogState.AWAITING_TASK_WITH_SHOPPING_ITEMS_TITLE, "✍️ Введи название списка:"),
-            CallbackType.CREATE_TASK, Pair.of(DialogState.AWAITING_TASK_TITLE, "✍️ Введи название задачи:"),
-            CallbackType.CREATE_TASK_WITH_SUBTASKS,
-            Pair.of(DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE, "✍️ Введи название основной задачи:"),
-            CallbackType.CREATE_ANOTHER_TASK, Pair.of(DialogState.AWAITING_TASK_TITLE, "✍️ Введи название задачи:"));
-
     @Override
     public boolean canHandle(UpdateContext context) {
-        return context.isCallback() && FLOW_CONFIG.containsKey(context.dto().getType());
+        return context.isCallback() && context.dto().getType().equals(CallbackType.MANUAL_SELECT_TIME);
     }
 
     @Override
     public List<PartialBotApiMethod<?>> handle(UpdateContext context) {
         var chatId = context.chatId();
-        var config = FLOW_CONFIG.get(context.dto().getType());
+        var taskId = context.dto().getEntityId();
         var messageId = context.update()
                 .getCallbackQuery()
                 .getMessage()
                 .getMessageId();
+        var date = context.dto().getExtra();
 
-        dialogService.setDialogState(chatId, config.getFirst(), null, null);
+        dialogService.setDialogState(chatId, DialogState.AWAITING_REMINDER_TIME, taskId, date);
 
         return List.of(
                 EditMessageText.builder()
                         .chatId(chatId)
                         .messageId(messageId)
-                        .text(config.getSecond())
+                        .text("Введи время в формате ЧЧ:ММ")
                         .build()
         );
     }

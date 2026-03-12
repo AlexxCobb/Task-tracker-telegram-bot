@@ -63,7 +63,7 @@ public class CalendarKeyboardService {
                            CallbackDto.builder().type(CallbackType.CALENDAR_IGNORE).build())
             )));
         }
-
+        rows.add(buildManualTimeButton(taskId, date, source));
         rows.add(buildBackToCalendarRow(taskId, YearMonth.from(date), source));
 
         return InlineKeyboardMarkup.builder().keyboard(rows).build();
@@ -178,6 +178,17 @@ public class CalendarKeyboardService {
 
         String timeLabel = String.format("%d:%02d", hour, minute);
         return button(timeLabel, dto);
+    }
+
+    private InlineKeyboardRow buildManualTimeButton(Long taskId, LocalDate date, CallbackType source) {
+        var dto = CallbackDto.builder()
+                .type(CallbackType.MANUAL_SELECT_TIME)
+                .entityId(taskId)
+                .source(source)
+                .extra(date.toString())
+                .build();
+
+        return new InlineKeyboardRow(List.of(button("Ввести время вручную", dto)));
     }
 
     private InlineKeyboardRow buildBackToCalendarRow(Long taskId, YearMonth yearMonth, CallbackType source) {

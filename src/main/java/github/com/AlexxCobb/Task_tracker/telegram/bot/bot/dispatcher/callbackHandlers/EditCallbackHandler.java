@@ -31,7 +31,7 @@ public class EditCallbackHandler implements UpdateHandler {
                 .getMessage()
                 .getMessageId();
 
-        dialogService.setDialogState(chatId, DialogState.EDIT_TASK, context.dto().getEntityId());
+        dialogService.setDialogState(chatId, DialogState.EDIT_TASK, context.dto().getEntityId(), null);
 
         return List.of(
                 EditMessageText.builder()
