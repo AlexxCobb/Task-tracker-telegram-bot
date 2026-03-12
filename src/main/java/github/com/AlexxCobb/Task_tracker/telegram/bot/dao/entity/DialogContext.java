@@ -39,6 +39,8 @@ public class DialogContext {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
+    private String extra;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

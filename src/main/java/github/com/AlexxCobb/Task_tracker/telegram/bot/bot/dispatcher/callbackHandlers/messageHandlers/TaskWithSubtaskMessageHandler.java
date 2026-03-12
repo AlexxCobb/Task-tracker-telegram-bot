@@ -31,7 +31,7 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
 
         if (context.dialogState().equals(DialogState.AWAITING_TASK_WITH_SUBTASK_TITLE)) {
             var taskId = taskService.createEpicTask(chatId, context.getText());
-            dialogService.setDialogState(chatId, DialogState.AWAITING_SUBTASK, taskId);
+            dialogService.setDialogState(chatId, DialogState.AWAITING_SUBTASK, taskId, null);
 
             return List.of(SendMessage.builder()
                                    .chatId(chatId)
@@ -39,7 +39,7 @@ public class TaskWithSubtaskMessageHandler implements UpdateHandler {
                                    .build());
         } else {
             var taskId = taskService.createShoppingList(chatId, context.getText());
-            dialogService.setDialogState(chatId, DialogState.AWAITING_SHOPPING_ITEM, taskId);
+            dialogService.setDialogState(chatId, DialogState.AWAITING_SHOPPING_ITEM, taskId, null);
 
             return List.of(SendMessage.builder()
                                    .chatId(chatId)

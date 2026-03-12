@@ -16,8 +16,8 @@ public class DialogService {
     private final DialogContextRepository contextRepository;
 
     @Transactional
-    public void setDialogState(Long chatId, DialogState state, Long taskId) {
-        contextRepository.updateContext(chatId, state.name(), taskId);
+    public void setDialogState(Long chatId, DialogState state, Long taskId, String extra) {
+        contextRepository.updateContext(chatId, state.name(), taskId, extra);
     }
 
     public DialogState getStateOrDefault(Long chatId) {
@@ -29,6 +29,11 @@ public class DialogService {
         return contextRepository.findById(chatId).map(DialogContext::getTaskId).orElseThrow(
                 DialogContextNotFoundException::new);
 
+    }
+
+    public String getRemindDate(Long chatId) {
+        return contextRepository.findById(chatId).map(DialogContext::getExtra).orElseThrow(
+                DialogContextNotFoundException::new);
     }
 
     @Transactional

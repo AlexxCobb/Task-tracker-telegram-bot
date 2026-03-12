@@ -33,6 +33,7 @@ public enum CallbackType {
     CALENDAR_NAVIGATE,
     CALENDAR_SELECT_DAY,
     CALENDAR_SELECT_TIME,
+    MANUAL_SELECT_TIME,
     CALENDAR_IGNORE;
 
     public Optional<TaskStatusFilter> toFilter() {

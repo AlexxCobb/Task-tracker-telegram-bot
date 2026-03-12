@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1773314835-update-dialog-context-table
+      author: a.zinovev
+      changes:
+        - sqlFile:
+            path: classpath:db/changelog/sql/1773314835-update-dialog-context-table.sql

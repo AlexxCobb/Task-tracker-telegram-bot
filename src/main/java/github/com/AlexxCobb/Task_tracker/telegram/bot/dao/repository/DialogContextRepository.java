@@ -12,15 +12,17 @@ public interface DialogContextRepository extends JpaRepository<DialogContext, Lo
 
     @Modifying
     @Query(value = """
-            INSERT INTO dialog_context (user_chat_id, dialog_state, task_id, updated_at)
-            VALUES (:chatId, :state, :taskId, now())
-            ON CONFLICT (user_chat_id) DO UPDATE
-            SET dialog_state = EXCLUDED.dialog_state,
-                task_id = EXCLUDED.task_id,
-                updated_at = EXCLUDED.updated_at
-            """, nativeQuery = true)
+        INSERT INTO dialog_context (user_chat_id, dialog_state, task_id, extra, updated_at)
+        VALUES (:chatId, :state, :taskId, :extra, now())
+        ON CONFLICT (user_chat_id) DO UPDATE
+        SET dialog_state = EXCLUDED.dialog_state,
+            task_id = EXCLUDED.task_id,
+            extra = EXCLUDED.extra,
+            updated_at = EXCLUDED.updated_at
+        """, nativeQuery = true)
     void updateContext(@Param("chatId") Long chatId,
                        @Param("state") String state,
-                       @Param("taskId") Long taskId);
+                       @Param("taskId") Long taskId,
+                       @Param("extra") String extra);
 
 }
