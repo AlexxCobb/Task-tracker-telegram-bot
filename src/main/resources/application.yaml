@@ -18,3 +18,11 @@ spring:
 bot:
   name: toDo_taskTracker_bot
   token: ${BOT_TOKEN}
+reminder:
+  scheduler:
+    fixed-delay: 60000
+    recovery-fixed-delay: 300000
+  batch:
+    scheduled-size: 100
+    processing-retry-size: 50
+    processing-timeout-minutes: 5

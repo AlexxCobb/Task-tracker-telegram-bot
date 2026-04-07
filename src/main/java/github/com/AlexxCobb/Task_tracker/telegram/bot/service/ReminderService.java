@@ -1,5 +1,6 @@
 package github.com.AlexxCobb.Task_tracker.telegram.bot.service;
 
+import github.com.AlexxCobb.Task_tracker.telegram.bot.bot.config.properties.ReminderProperties;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Reminder;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.entity.Task;
 import github.com.AlexxCobb.Task_tracker.telegram.bot.dao.enums.ReminderStatus;
@@ -23,10 +24,12 @@ public class ReminderService {
 
     private final ReminderRepository reminderRepository;
     private final ReminderMapper reminderMapper;
+    private final ReminderProperties reminderProperties;
 
     @Transactional
     public void createTaskRemind(Long chatId, Task task, OffsetDateTime dateTime) {
-        var alreadyExists = reminderRepository.existsByTaskIdAndRemindAtAndStatus(task.getId(), dateTime, ReminderStatus.SCHEDULED);
+        var alreadyExists =
+                reminderRepository.existsByTaskIdAndRemindAtAndStatus(task.getId(), dateTime, ReminderStatus.SCHEDULED);
         if (alreadyExists) {
             throw new ReminderAlreadyExistsException();
         }
@@ -41,12 +44,13 @@ public class ReminderService {
     }
 
     @Transactional
-    public List<ReminderDetails> lockDetails(int batchSize) {
-        var reminderIds = reminderRepository.selectForUpdate(batchSize);
+    public List<ReminderDetails> lockDetails() {
+        var scheduledBatch = reminderProperties.batch().scheduledSize();
+        var reminderIds = reminderRepository.selectForUpdate(scheduledBatch);
+
         if (reminderIds.isEmpty()) {
             return Collections.emptyList();
         }
-
         reminderRepository.updateStatusAtByIds(ReminderStatus.PROCESSING, OffsetDateTime.now(), reminderIds);
 
         var reminders = reminderRepository.findPendingWithTasks(reminderIds);
@@ -76,5 +80,18 @@ public class ReminderService {
         var reminder = reminderRepository.findUserReminderWithTasks(reminderId, chatId).orElseThrow(
                 ForbiddenException::new);
         return reminderMapper.toReminderDetails(reminder);
+    }
+
+    @Transactional
+    public void recoverStuckReminderDetails() {
+        var batch = reminderProperties.batch().processingRetrySize();
+        var timeOut = reminderProperties.batch().processingTimeoutMinutes();
+
+        var reminderIds = reminderRepository.selectForUpdateStuckReminders(
+                OffsetDateTime.now().minusMinutes(timeOut), batch);
+        if (reminderIds.isEmpty()) {
+            return;
+        }
+        reminderRepository.resetProcessingToScheduled(reminderIds);
     }
 }
