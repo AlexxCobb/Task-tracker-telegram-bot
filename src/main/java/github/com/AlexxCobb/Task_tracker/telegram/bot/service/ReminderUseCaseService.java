@@ -19,7 +19,7 @@ public class ReminderUseCaseService {
     }
 
     public void sendReminderUseCase() {
-        var reminders = reminderService.lockDetails(100);
+        var reminders = reminderService.lockDetails();
         if (reminders.isEmpty()) {
             return;
         }
@@ -27,6 +27,10 @@ public class ReminderUseCaseService {
         if (!sentReminderIds.isEmpty()) {
             reminderService.markSent(sentReminderIds);
         }
+    }
+
+    public void recoverStuckRemindersUseCase() {
+        reminderService.recoverStuckReminderDetails();
     }
 
     public void cancelReminderUseCase(Long remindId) {

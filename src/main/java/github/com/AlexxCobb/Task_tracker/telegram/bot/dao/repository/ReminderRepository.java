@@ -23,7 +23,7 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
     void updateStatusAtByIds(ReminderStatus status, OffsetDateTime sentAt, List<Long> ids);
 
     @Query(value = "select reminder_id from reminder where status = 'SCHEDULED' and remind_at <= now() "
-            + "for update skip locked limit :batchSize", nativeQuery = true)
+            + "order by remind_at for update skip locked limit :batchSize", nativeQuery = true)
     List<Long> selectForUpdate(int batchSize);
 
     @Query(value = "select r from Reminder r join fetch r.task t left join fetch t.subtasks " +
@@ -36,4 +36,12 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
     Optional<Reminder> findUserReminderWithTasks(Long reminderId, Long chatId);
 
     boolean existsByTaskIdAndRemindAtAndStatus(Long taskId, OffsetDateTime remindAt, ReminderStatus status);
+
+    @Query(value = "select reminder_id from reminder where status = 'PROCESSING' and sent_at < :missedSentAt "
+            + "for update skip locked limit :batchSize", nativeQuery = true)
+    List<Long> selectForUpdateStuckReminders(OffsetDateTime missedSentAt, int batchSize);
+
+    @Modifying
+    @Query("update Reminder r set r.status = 'SCHEDULED', r.sentAt = NULL where r.id in :ids and r.status = 'PROCESSING'")
+    void resetProcessingToScheduled(List<Long> ids);
 }
